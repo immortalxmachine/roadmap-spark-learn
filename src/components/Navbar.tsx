@@ -1,16 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, LogIn, Volume2, VolumeX } from 'lucide-react';
+import { Menu, X, LogIn, Volume2, VolumeX, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import NavLink from './NavLink';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { ttsEnabled, toggleTts, speak } = useAccessibility();
+  const { ttsEnabled, toggleTts, visualAlertsEnabled, toggleVisualAlerts, speak } = useAccessibility();
 
   const handleScroll = () => {
     const offset = window.scrollY;
@@ -81,15 +82,42 @@ const Navbar: React.FC = () => {
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={toggleTts}
-            className={ttsEnabled ? "text-primary" : "text-muted-foreground"}
-            title={ttsEnabled ? "Disable Text-to-Speech" : "Enable Text-to-Speech"}
-          >
-            {ttsEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={toggleTts}
+                  className={ttsEnabled ? "text-primary" : "text-muted-foreground"}
+                >
+                  {ttsEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {ttsEnabled ? "Disable Text-to-Speech" : "Enable Text-to-Speech"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={toggleVisualAlerts}
+                  className={visualAlertsEnabled ? "text-primary" : "text-muted-foreground"}
+                >
+                  {visualAlertsEnabled ? <Eye size={20} /> : <EyeOff size={20} />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {visualAlertsEnabled ? "Disable Visual Alerts" : "Enable Visual Alerts"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
           <Button variant="outline" size="sm" asChild>
             <Link 
               to="/dashboard"
@@ -119,6 +147,16 @@ const Navbar: React.FC = () => {
           >
             {ttsEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
           </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleVisualAlerts}
+            className={visualAlertsEnabled ? "text-primary" : "text-muted-foreground"}
+          >
+            {visualAlertsEnabled ? <Eye size={20} /> : <EyeOff size={20} />}
+          </Button>
+          
           <button
             className="rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary"
             onClick={toggleMenu}

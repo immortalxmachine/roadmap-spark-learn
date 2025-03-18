@@ -3,8 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download, BookOpen, Video, Volume2 } from 'lucide-react';
+import { Download, BookOpen, Video, Volume2, Info } from 'lucide-react';
 import TextToSpeech from '@/components/accessibility/TextToSpeech';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface StudyMaterialCardProps {
   title: string;
@@ -37,12 +38,33 @@ const StudyMaterialCard: React.FC<StudyMaterialCardProps> = ({
     audio: <Volume2 className="h-4 w-4 mr-1" />
   };
 
+  // Descriptive text for screen readers and TTS
+  const accessibilityDescription = `Study material: ${title}. Type: ${type === 'notes' ? 'Text Notes' : type === 'video' ? 'Video Lecture' : 'Audio Explanation'}. Subject: ${subject}. Difficulty: ${difficulty}. Description: ${description}`;
+
   return (
     <Card className="h-full flex flex-col hover:shadow-md transition-shadow duration-200">
       <CardHeader>
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg">{title}</CardTitle>
-          <TextToSpeech text={`${title}. ${description}`} />
+          <div className="flex items-center">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 mr-1" aria-label="Material information">
+                    <Info className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{accessibilityDescription}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TextToSpeech 
+              text={accessibilityDescription} 
+              showControls={true}
+              iconOnly={true}
+            />
+          </div>
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
           <Badge variant="outline" className="flex items-center">

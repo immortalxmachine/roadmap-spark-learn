@@ -2,12 +2,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { BookOpen, Brain, Award, FileText, Users, MessageCircle, Settings, BarChart3, Heart } from 'lucide-react';
+import { BookOpen, Brain, Award, FileText, Users, MessageCircle, Settings, BarChart3, Heart, Volume2, VolumeX, Eye, EyeOff } from 'lucide-react';
 import AnimatedAvatar from './ui/avatar-animated';
 import { ScrollArea } from './ui/scroll-area';
 import { Separator } from './ui/separator';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const location = useLocation();
+  const { ttsEnabled, toggleTts, visualAlertsEnabled, toggleVisualAlerts, speak } = useAccessibility();
   
   const navItems = [
     { 
@@ -55,7 +57,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     },
     { 
       path: '/support', 
-      label: 'Support', 
+      label: 'Crisis Support', 
       icon: Heart,
       notification: false
     },
@@ -67,6 +69,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     },
   ];
 
+  const handleNavItemClick = (label: string) => {
+    if (ttsEnabled) {
+      speak(`Navigating to ${label}`);
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-background">
       {/* Sidebar */}
@@ -77,6 +85,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               Study<span className="font-extrabold">Spark</span>
             </span>
           </Link>
+          
+          <div className="flex items-center space-x-1">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={toggleTts}
+              title={ttsEnabled ? "Disable Text-to-Speech" : "Enable Text-to-Speech"}
+            >
+              {ttsEnabled ? <Volume2 className="h-4 w-4 text-primary" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={toggleVisualAlerts}
+              title={visualAlertsEnabled ? "Disable Visual Alerts" : "Enable Visual Alerts"}
+            >
+              {visualAlertsEnabled ? <Eye className="h-4 w-4 text-primary" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
+            </Button>
+          </div>
         </div>
         
         <Separator />
@@ -96,7 +126,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         
         <ScrollArea className="flex-1 py-2">
           {navItems.map((item) => (
-            <Link key={item.path} to={item.path}>
+            <Link 
+              key={item.path} 
+              to={item.path}
+              onClick={() => handleNavItemClick(item.label)}
+            >
               <div 
                 className={cn(
                   "flex items-center justify-between px-4 py-2 mx-2 rounded-md cursor-pointer group transition-colors",
@@ -156,6 +190,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             Study<span className="font-extrabold">Spark</span>
           </Link>
           <div className="flex items-center space-x-3">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={toggleTts}
+            >
+              {ttsEnabled ? <Volume2 className="h-5 w-5 text-primary" /> : <VolumeX className="h-5 w-5" />}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={toggleVisualAlerts}
+            >
+              {visualAlertsEnabled ? <Eye className="h-5 w-5 text-primary" /> : <EyeOff className="h-5 w-5" />}
+            </Button>
             <Button variant="ghost" size="icon">
               <MessageCircle className="h-5 w-5" />
             </Button>
@@ -182,6 +230,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 "flex flex-col items-center justify-center p-2 rounded-md relative",
                 location.pathname === item.path ? "text-primary" : "text-muted-foreground"
               )}
+              onClick={() => handleNavItemClick(item.label)}
             >
               <item.icon className="h-5 w-5" />
               <span className="text-xs mt-1">{item.label.split(' ')[0]}</span>

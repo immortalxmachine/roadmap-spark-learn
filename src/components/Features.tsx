@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { BookOpen, Brain, Award, BookCheck, Users, BarChart3, Settings, Lightbulb, Volume2, Eye } from 'lucide-react';
+import { BookOpen, Brain, Award, BookCheck, Users, BarChart3, Settings, Lightbulb, Volume2, Eye, Accessibility } from 'lucide-react';
 import FeatureCard from './FeatureCard';
 import FadeIn from './animations/FadeIn';
+import TextToSpeech from './accessibility/TextToSpeech';
 
 const Features: React.FC = () => {
   const features = [
@@ -55,7 +56,7 @@ const Features: React.FC = () => {
       delay: 300
     },
     {
-      icon: Users,
+      icon: Accessibility,
       title: 'Inclusive Learning',
       description: 'Accessibility features for blind and deaf students including text-to-speech and visual cues.',
       iconColor: 'text-indigo-600',
@@ -73,6 +74,8 @@ const Features: React.FC = () => {
     }
   ];
 
+  const accessibilityDescription = "Our platform is designed to be accessible to all students, including those with visual or hearing impairments. We provide features like text-to-speech for visually impaired users and enhanced visual cues for hearing impaired users.";
+
   return (
     <section id="features" className="app-section relative overflow-hidden bg-gradient-to-b from-background to-secondary/30">
       <div className="container-custom">
@@ -81,6 +84,9 @@ const Features: React.FC = () => {
           <p className="text-muted-foreground">
             Our platform combines cutting-edge AI technology with effective learning methodologies to create a comprehensive study environment.
           </p>
+          <div className="mt-2 flex justify-center">
+            <TextToSpeech text={accessibilityDescription} showControls={true} />
+          </div>
         </FadeIn>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -100,6 +106,17 @@ const Features: React.FC = () => {
 
         {/* Accessibility highlight section */}
         <FadeIn direction="up" className="mt-16 bg-primary/5 p-6 rounded-xl border border-primary/20">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-xl font-bold flex items-center">
+              <Accessibility className="inline-block mr-2 text-primary" />
+              Inclusive Learning Features
+            </h3>
+            <TextToSpeech 
+              text="Our platform offers comprehensive accessibility features for both visually impaired and hearing impaired students. For visually impaired students, we provide text-to-speech functionality for all study materials, voice-controlled navigation throughout the platform, adjustable speech rate for comfortable listening, and audio descriptions for visual elements. For hearing impaired students, we offer enhanced visual notifications and alerts, visual cues for important events and deadlines, text-based chat interface with AI assistant, and captions and transcripts for all video content."
+              showControls={true}
+            />
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col justify-center">
               <h3 className="text-xl font-bold mb-4 flex items-center">
