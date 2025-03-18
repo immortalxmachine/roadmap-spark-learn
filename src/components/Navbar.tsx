@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import NavLink from './NavLink';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,10 +32,11 @@ const Navbar: React.FC = () => {
 
   const navItems = [
     { name: 'Home', href: '/' },
-    { name: 'Features', href: '/#features' },
-    { name: 'Library', href: '/#library' },
-    { name: 'Roadmap', href: '/#roadmap' },
-    { name: 'AI Assistant', href: '/#assistant' },
+    { name: 'Dashboard', href: '/dashboard' },
+    { name: 'Digital Library', href: '/library' },
+    { name: 'Study Roadmap', href: '/roadmap' },
+    { name: 'Mock Tests', href: '/mock-tests' },
+    { name: 'AI Assistant', href: '/assistant' },
   ];
 
   return (
@@ -56,21 +58,22 @@ const Navbar: React.FC = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
           {navItems.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-secondary"
-            >
+            <NavLink key={item.name} href={item.href}>
               {item.name}
-            </a>
+            </NavLink>
           ))}
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Button variant="outline" size="sm">
-            Log In
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/dashboard">
+              <LogIn className="mr-2 h-4 w-4" />
+              Log In
+            </Link>
           </Button>
-          <Button size="sm">Get Started</Button>
+          <Button size="sm" asChild>
+            <Link to="/dashboard">Get Started</Link>
+          </Button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -93,21 +96,24 @@ const Navbar: React.FC = () => {
       >
         <nav className="flex flex-col items-center pt-6 space-y-8">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.name}
-              href={item.href}
+              to={item.href}
               className="w-full text-center py-3 px-8 text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               {item.name}
-            </a>
+            </Link>
           ))}
           <div className="flex flex-col w-full px-6 space-y-4 pt-4">
-            <Button variant="outline" className="w-full" onClick={() => setIsMenuOpen(false)}>
-              Log In
+            <Button variant="outline" className="w-full" onClick={() => setIsMenuOpen(false)} asChild>
+              <Link to="/dashboard">
+                <LogIn className="mr-2 h-4 w-4" />
+                Log In
+              </Link>
             </Button>
-            <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
-              Get Started
+            <Button className="w-full" onClick={() => setIsMenuOpen(false)} asChild>
+              <Link to="/dashboard">Get Started</Link>
             </Button>
           </div>
         </nav>
