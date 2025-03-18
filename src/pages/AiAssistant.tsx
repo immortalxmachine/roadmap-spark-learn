@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { MessageCircle, Mic, SendHorizontal, BookOpen, Volume2, Volume1, VolumeX, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
 import AnimatedAvatar from '@/components/ui/avatar-animated';
 import FadeIn from '@/components/animations/FadeIn';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
+import VisualAlert from '@/components/accessibility/VisualAlert';
 
 const AiAssistant = () => {
   const [messages, setMessages] = useState([
@@ -57,9 +59,11 @@ const AiAssistant = () => {
   
   const [newMessage, setNewMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showResponseOptions, setShowResponseOptions] = useState(false);
+  const { ttsEnabled, speak, stopSpeaking, isSpeaking } = useAccessibility();
   
   useEffect(() => {
     // Scroll to bottom whenever messages change
@@ -78,6 +82,10 @@ const AiAssistant = () => {
     
     setMessages([...messages, userMessage]);
     setNewMessage('');
+    
+    // Show visual alert for deaf users
+    setAlertMessage("Message sent successfully!");
+    setShowAlert(true);
     
     // Simulate assistant response after a short delay
     setTimeout(() => {
@@ -101,6 +109,11 @@ const AiAssistant = () => {
       };
       
       setMessages(prevMessages => [...prevMessages, assistantResponse]);
+      
+      // Auto-read the response for blind users if TTS is enabled
+      if (ttsEnabled) {
+        speak(assistantResponse.text);
+      }
     }, 1500);
   };
   
@@ -113,22 +126,53 @@ const AiAssistant = () => {
   
   const startRecording = () => {
     setIsRecording(true);
-    // Implement actual voice recording logic here
+    // For blind users, provide audio feedback
+    if (ttsEnabled) {
+      speak("Recording started. Please speak your question.");
+    }
+    
+    // For deaf users, provide visual feedback
+    setAlertMessage("Recording started. Please speak your question.");
+    setShowAlert(true);
     
     // Simulate ending recording after 3 seconds
     setTimeout(() => {
       setIsRecording(false);
       setNewMessage("Can you explain how transformers work in more detail?");
+      
+      // Feedback for blind users
+      if (ttsEnabled) {
+        speak("Recording completed. Your question is: Can you explain how transformers work in more detail?");
+      }
+      
+      // Visual feedback for deaf users
+      setAlertMessage("Recording completed!");
+      setShowAlert(true);
     }, 3000);
   };
   
   const stopRecording = () => {
     setIsRecording(false);
+    // Feedback for blind users
+    if (ttsEnabled) {
+      speak("Recording stopped.");
+    }
+    
+    // Visual feedback for deaf users
+    setAlertMessage("Recording stopped.");
+    setShowAlert(true);
   };
   
   const toggleSpeaking = () => {
-    setIsSpeaking(!isSpeaking);
-    // Implement actual text-to-speech logic here
+    if (isSpeaking) {
+      stopSpeaking();
+    } else {
+      // Read the last assistant message
+      const lastAssistantMessage = [...messages].reverse().find(m => m.sender === 'assistant');
+      if (lastAssistantMessage) {
+        speak(lastAssistantMessage.text);
+      }
+    }
   };
   
   const getFormattedTime = (timestamp: string) => {
@@ -150,6 +194,12 @@ const AiAssistant = () => {
     setShowResponseOptions(!showResponseOptions);
   };
 
+  const readMessage = (text: string) => {
+    if (ttsEnabled) {
+      speak(text);
+    }
+  };
+
   const suggestedResponses = [
     "Can you explain how transformers work in more detail?",
     "How does electromagnetism relate to electricity generation?",
@@ -163,6 +213,12 @@ const AiAssistant = () => {
           <h1 className="text-2xl font-bold mb-1">AI Assistant</h1>
           <p className="text-muted-foreground">Get help with your studies and resolve your doubts</p>
         </div>
+        
+        <VisualAlert 
+          show={showAlert} 
+          message={alertMessage} 
+          onClose={() => setShowAlert(false)} 
+        />
 
         <Card className="h-[calc(100vh-14rem)]">
           <CardContent className="p-0 flex flex-col h-full">
@@ -185,6 +241,7 @@ const AiAssistant = () => {
                   size="icon" 
                   onClick={toggleSpeaking}
                   className={isSpeaking ? "text-primary bg-primary/10" : ""}
+                  title={isSpeaking ? "Stop Speaking" : "Read Last Message"}
                 >
                   {isSpeaking ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
                 </Button>
@@ -216,7 +273,19 @@ const AiAssistant = () => {
                           : 'bg-secondary rounded-bl-none'
                       }`}
                     >
-                      <p className="whitespace-pre-line">{renderMessageText(message.text)}</p>
+                      <div className="flex justify-between items-start">
+                        <p className="whitespace-pre-line">{renderMessageText(message.text)}</p>
+                        {message.sender === 'assistant' && ttsEnabled && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 ml-2 -mt-1" 
+                            onClick={() => readMessage(message.text)}
+                          >
+                            <Volume2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     
                     <span className="text-xs text-muted-foreground mt-1 ml-1">
@@ -309,12 +378,14 @@ const AiAssistant = () => {
                     onKeyDown={handleKeyPress}
                     placeholder="Type your question here..."
                     className="pr-10"
+                    aria-label="Message input"
                   />
                   {newMessage && (
                     <Button
                       size="icon"
                       className="absolute right-1 top-1 h-8 w-8"
                       onClick={handleSendMessage}
+                      aria-label="Send message"
                     >
                       <SendHorizontal className="h-4 w-4" />
                     </Button>
@@ -325,6 +396,7 @@ const AiAssistant = () => {
                   variant={isRecording ? "default" : "outline"}
                   className={isRecording ? "bg-red-500 text-white hover:bg-red-600" : ""}
                   onClick={isRecording ? stopRecording : startRecording}
+                  aria-label={isRecording ? "Stop recording" : "Start recording"}
                 >
                   <Mic className="h-4 w-4" />
                 </Button>

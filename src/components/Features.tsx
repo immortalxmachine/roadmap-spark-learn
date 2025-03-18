@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookOpen, Brain, Award, BookCheck, Users, BarChart3, Settings, Lightbulb } from 'lucide-react';
+import { BookOpen, Brain, Award, BookCheck, Users, BarChart3, Settings, Lightbulb, Volume2, Eye } from 'lucide-react';
 import FeatureCard from './FeatureCard';
 import FadeIn from './animations/FadeIn';
 
@@ -60,7 +60,8 @@ const Features: React.FC = () => {
       description: 'Accessibility features for blind and deaf students including text-to-speech and visual cues.',
       iconColor: 'text-indigo-600',
       iconBgColor: 'bg-indigo-100',
-      delay: 100
+      delay: 100,
+      highlightInclusive: true
     },
     {
       icon: Settings,
@@ -92,9 +93,64 @@ const Features: React.FC = () => {
               iconColor={feature.iconColor}
               iconBgColor={feature.iconBgColor}
               delay={feature.delay}
+              className={feature.highlightInclusive ? "ring-2 ring-primary/30 shadow-lg" : ""}
             />
           ))}
         </div>
+
+        {/* Accessibility highlight section */}
+        <FadeIn direction="up" className="mt-16 bg-primary/5 p-6 rounded-xl border border-primary/20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex flex-col justify-center">
+              <h3 className="text-xl font-bold mb-4 flex items-center">
+                <Volume2 className="inline-block mr-2 text-primary" />
+                For Visually Impaired Students
+              </h3>
+              <ul className="space-y-2">
+                <li className="flex items-start">
+                  <span className="text-primary mr-2">✓</span>
+                  <span>Text-to-Speech functionality for all study materials</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-primary mr-2">✓</span>
+                  <span>Voice-controlled navigation throughout the platform</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-primary mr-2">✓</span>
+                  <span>Adjustable speech rate for comfortable listening</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-primary mr-2">✓</span>
+                  <span>Audio descriptions for charts, graphs and visual elements</span>
+                </li>
+              </ul>
+            </div>
+            <div className="flex flex-col justify-center">
+              <h3 className="text-xl font-bold mb-4 flex items-center">
+                <Eye className="inline-block mr-2 text-primary" />
+                For Hearing Impaired Students
+              </h3>
+              <ul className="space-y-2">
+                <li className="flex items-start">
+                  <span className="text-primary mr-2">✓</span>
+                  <span>Enhanced visual notifications and alerts</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-primary mr-2">✓</span>
+                  <span>Visual cues for important events and deadlines</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-primary mr-2">✓</span>
+                  <span>Text-based chat interface with AI assistant</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-primary mr-2">✓</span>
+                  <span>Captions and transcripts for all video content</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );

@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, LogIn } from 'lucide-react';
+import { Menu, X, LogIn, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import NavLink from './NavLink';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { ttsEnabled, toggleTts, speak } = useAccessibility();
 
   const handleScroll = () => {
     const offset = window.scrollY;
@@ -39,6 +41,12 @@ const Navbar: React.FC = () => {
     { name: 'AI Assistant', href: '/assistant' },
   ];
 
+  const handleNavItemClick = (itemName: string) => {
+    if (ttsEnabled) {
+      speak(`Navigating to ${itemName}`);
+    }
+  };
+
   return (
     <header
       className={cn(
@@ -49,7 +57,11 @@ const Navbar: React.FC = () => {
       )}
     >
       <div className="container-custom flex items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
+        <Link 
+          to="/" 
+          className="flex items-center space-x-2"
+          onClick={() => handleNavItemClick('Home')}
+        >
           <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Study<span className="font-extrabold">Spark</span>
           </span>
@@ -58,32 +70,63 @@ const Navbar: React.FC = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
           {navItems.map((item) => (
-            <NavLink key={item.name} href={item.href}>
+            <NavLink 
+              key={item.name} 
+              href={item.href}
+              onClick={() => handleNavItemClick(item.name)}
+            >
               {item.name}
             </NavLink>
           ))}
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTts}
+            className={ttsEnabled ? "text-primary" : "text-muted-foreground"}
+            title={ttsEnabled ? "Disable Text-to-Speech" : "Enable Text-to-Speech"}
+          >
+            {ttsEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to="/dashboard">
+            <Link 
+              to="/dashboard"
+              onClick={() => handleNavItemClick('Dashboard')}
+            >
               <LogIn className="mr-2 h-4 w-4" />
               Log In
             </Link>
           </Button>
           <Button size="sm" asChild>
-            <Link to="/dashboard">Get Started</Link>
+            <Link 
+              to="/dashboard"
+              onClick={() => handleNavItemClick('Dashboard')}
+            >
+              Get Started
+            </Link>
           </Button>
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          className="md:hidden rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="md:hidden flex items-center space-x-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTts}
+            className={ttsEnabled ? "text-primary" : "text-muted-foreground"}
+          >
+            {ttsEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          </Button>
+          <button
+            className="rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Navigation */}
@@ -100,20 +143,31 @@ const Navbar: React.FC = () => {
               key={item.name}
               to={item.href}
               className="w-full text-center py-3 px-8 text-base font-medium"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleNavItemClick(item.name);
+              }}
             >
               {item.name}
             </Link>
           ))}
           <div className="flex flex-col w-full px-6 space-y-4 pt-4">
             <Button variant="outline" className="w-full" onClick={() => setIsMenuOpen(false)} asChild>
-              <Link to="/dashboard">
+              <Link 
+                to="/dashboard"
+                onClick={() => handleNavItemClick('Dashboard')}
+              >
                 <LogIn className="mr-2 h-4 w-4" />
                 Log In
               </Link>
             </Button>
             <Button className="w-full" onClick={() => setIsMenuOpen(false)} asChild>
-              <Link to="/dashboard">Get Started</Link>
+              <Link 
+                to="/dashboard"
+                onClick={() => handleNavItemClick('Dashboard')}
+              >
+                Get Started
+              </Link>
             </Button>
           </div>
         </nav>

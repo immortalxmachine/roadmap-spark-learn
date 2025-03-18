@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +9,7 @@ import { BadgeAlert, User, Bell, BarChart3, Lock, Eye, EyeOff, Volume, VolumeX, 
 import FadeIn from '@/components/animations/FadeIn';
 import AnimatedAvatar from '@/components/ui/avatar-animated';
 import { Badge } from '@/components/ui/badge';
+import AccessibilitySettings from '@/components/accessibility/AccessibilitySettings';
 
 const ProfileSettings = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -278,154 +278,7 @@ const ProfileSettings = () => {
             )}
             
             {activeTab === 'accessibility' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Accessibility Settings</CardTitle>
-                  <CardDescription>Configure options to make the platform more accessible</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="font-medium">Visual Settings</h3>
-                      <div className="grid grid-cols-1 gap-3">
-                        <div className="flex justify-between items-center p-3 rounded-lg bg-secondary/50">
-                          <div className="flex items-center">
-                            {settings.darkMode ? <Moon className="h-5 w-5 mr-3" /> : <SunMedium className="h-5 w-5 mr-3" />}
-                            <div>
-                              <h3 className="font-medium">{settings.darkMode ? 'Dark Mode' : 'Light Mode'}</h3>
-                              <p className="text-sm text-muted-foreground">
-                                {settings.darkMode ? 'Easier on the eyes in low light' : 'Standard display mode'}
-                              </p>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleToggle('darkMode')}
-                            className={`w-12 h-6 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${
-                              settings.darkMode ? 'bg-primary justify-end' : 'bg-muted justify-start'
-                            }`}
-                          >
-                            <span className="w-5 h-5 rounded-full bg-white shadow-sm transform mx-0.5"></span>
-                          </button>
-                        </div>
-                        
-                        <div className="flex justify-between items-center p-3 rounded-lg bg-secondary/50">
-                          <div className="flex items-center">
-                            {settings.visualAlerts ? <Eye className="h-5 w-5 mr-3" /> : <EyeOff className="h-5 w-5 mr-3" />}
-                            <div>
-                              <h3 className="font-medium">Enhanced Visual Alerts</h3>
-                              <p className="text-sm text-muted-foreground">Additional visual cues for notifications</p>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleToggle('visualAlerts')}
-                            className={`w-12 h-6 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${
-                              settings.visualAlerts ? 'bg-primary justify-end' : 'bg-muted justify-start'
-                            }`}
-                          >
-                            <span className="w-5 h-5 rounded-full bg-white shadow-sm transform mx-0.5"></span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-medium">Audio Settings</h3>
-                      <div className="grid grid-cols-1 gap-3">
-                        <div className="flex justify-between items-center p-3 rounded-lg bg-secondary/50">
-                          <div className="flex items-center">
-                            {settings.ttsEnabled ? <Volume className="h-5 w-5 mr-3" /> : <VolumeX className="h-5 w-5 mr-3" />}
-                            <div>
-                              <h3 className="font-medium">Text-to-Speech</h3>
-                              <p className="text-sm text-muted-foreground">Read content aloud for visually impaired users</p>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleToggle('ttsEnabled')}
-                            className={`w-12 h-6 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${
-                              settings.ttsEnabled ? 'bg-primary justify-end' : 'bg-muted justify-start'
-                            }`}
-                          >
-                            <span className="w-5 h-5 rounded-full bg-white shadow-sm transform mx-0.5"></span>
-                          </button>
-                        </div>
-                        
-                        {settings.ttsEnabled && (
-                          <>
-                            <div className="p-3 rounded-lg bg-secondary/50">
-                              <Label htmlFor="voice" className="mb-2 block text-sm font-medium">Voice Selection</Label>
-                              <select 
-                                id="voice" 
-                                className="w-full p-2 rounded-md border border-input bg-background"
-                              >
-                                <option value="david">David (Male)</option>
-                                <option value="sarah">Sarah (Female)</option>
-                                <option value="james">James (Male)</option>
-                                <option value="emma">Emma (Female)</option>
-                              </select>
-                            </div>
-                            
-                            <div className="p-3 rounded-lg bg-secondary/50">
-                              <Label htmlFor="speed" className="mb-2 block text-sm font-medium">Speech Speed</Label>
-                              <div className="flex items-center space-x-2">
-                                <input 
-                                  type="range" 
-                                  id="speed" 
-                                  min="0.5" 
-                                  max="2" 
-                                  step="0.1" 
-                                  defaultValue="1"
-                                  className="w-full"
-                                />
-                              </div>
-                              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                                <span>Slower</span>
-                                <span>Normal</span>
-                                <span>Faster</span>
-                              </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-medium">Accessibility Mode</h3>
-                      <div className="space-y-3">
-                        {accessibilityModeOptions.map((option) => (
-                          <div 
-                            key={option.value}
-                            className={`p-3 rounded-lg border cursor-pointer ${
-                              settings.accessibilityMode === option.value 
-                                ? 'border-primary bg-primary/5' 
-                                : 'border-border hover:border-primary/50'
-                            }`}
-                            onClick={() => setSettings(prev => ({ ...prev, accessibilityMode: option.value }))}
-                          >
-                            <div className="flex items-center">
-                              <div className={`w-4 h-4 rounded-full border mr-3 ${
-                                settings.accessibilityMode === option.value 
-                                  ? 'border-4 border-primary' 
-                                  : 'border-muted-foreground'
-                              }`}></div>
-                              <span className="font-medium">{option.label}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex justify-end">
-                      <Button>Save Accessibility Settings</Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <AccessibilitySettings />
             )}
             
             {activeTab === 'preferences' && (

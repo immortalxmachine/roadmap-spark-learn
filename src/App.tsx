@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AccessibilityProvider } from "./contexts/AccessibilityContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
@@ -19,25 +20,27 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/library" element={<DigitalLibrary />} />
-          <Route path="/roadmap" element={<StudyRoadmap />} />
-          <Route path="/mock-tests" element={<MockTests />} />
-          <Route path="/assistant" element={<AiAssistant />} />
-          <Route path="/gamification" element={<Gamification />} />
-          <Route path="/profile" element={<ProfileSettings />} />
-          <Route path="/support" element={<CrisisSupport />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AccessibilityProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/library" element={<DigitalLibrary />} />
+            <Route path="/roadmap" element={<StudyRoadmap />} />
+            <Route path="/mock-tests" element={<MockTests />} />
+            <Route path="/assistant" element={<AiAssistant />} />
+            <Route path="/gamification" element={<Gamification />} />
+            <Route path="/profile" element={<ProfileSettings />} />
+            <Route path="/support" element={<CrisisSupport />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AccessibilityProvider>
   </QueryClientProvider>
 );
 
