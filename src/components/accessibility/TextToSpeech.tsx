@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Play, Square, Pause, VolumeUp, Volume1 } from 'lucide-react';
+import { Volume2, VolumeX, Play, Square, Pause, Volume, Volume1 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
@@ -40,7 +40,7 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({
     return speechRate < 0.8 ? 
       <Volume1 className="h-4 w-4" /> : 
       speechRate > 1.2 ? 
-        <VolumeUp className="h-4 w-4" /> : 
+        <Volume className="h-4 w-4" /> : 
         <Volume2 className="h-4 w-4" />;
   };
 
