@@ -67,12 +67,12 @@ const TutorCard: React.FC<TutorCardProps> = ({ tutor, onSchedule }) => {
                 )}
                 {tutor.status === 'busy' && (
                   <Badge variant="outline" className="text-muted-foreground">
-                    Available in {tutor.availableIn}
+                    Available in {tutor.available_in}
                   </Badge>
                 )}
                 {tutor.status === 'scheduled' && (
                   <Badge variant="outline" className="text-muted-foreground">
-                    Next: {tutor.nextSession}
+                    Next: {tutor.next_session}
                   </Badge>
                 )}
               </div>
