@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,14 +11,15 @@ import { MessageCircle, Phone, Video, Calendar, Search, Filter, Upload } from 'l
 import { useToast } from "@/hooks/use-toast";
 import { subjects } from '@/data/subjects';
 import TutorCard from './TutorCard';
-import { Tutor } from '@/types/tutor';
+import { Tutor, TutorFilters } from '@/types/tutor';
+import { useTutors } from '@/hooks/useTutors';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface FindTutorTabProps {
-  tutors: Tutor[];
   onScheduleWithTutor?: (tutor: Tutor) => void;
 }
 
-const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor }) => {
+const FindTutorTab: React.FC<FindTutorTabProps> = ({ onScheduleWithTutor }) => {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [urgencyLevel, setUrgencyLevel] = useState<string>("");
@@ -29,17 +29,13 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
     voice: boolean; 
     video: boolean 
   }>({ text: false, voice: false, video: false });
-  const [filteredTutors, setFilteredTutors] = useState<Tutor[]>(tutors);
+  const [filters, setFilters] = useState<TutorFilters>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
+  
+  const { tutors, isLoading, error } = useTutors(filters);
+  const [filteredTutors, setFilteredTutors] = useState<Tutor[]>([]);
 
-  // When tutors prop changes, update the filtered tutors
-  useEffect(() => {
-    setFilteredTutors(tutors);
-  }, [tutors]);
-
-  // Update filtered tutors when search query changes
   useEffect(() => {
     if (searchQuery.trim() === "") {
       setFilteredTutors(tutors);
@@ -68,56 +64,43 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
 
     setIsSubmitting(true);
     
-    // Find the best matching tutors
-    const matchedTutors = findMatchingTutors();
-    setFilteredTutors(matchedTutors.length > 0 ? matchedTutors : tutors);
+    const newFilters: TutorFilters = { subject: selectedSubject };
+    
+    const selectedModes = [];
+    if (commPreferences.text) selectedModes.push('text');
+    if (commPreferences.voice) selectedModes.push('voice');
+    if (commPreferences.video) selectedModes.push('video');
+    
+    if (selectedModes.length > 0) {
+      newFilters.communicationMode = selectedModes[0];
+    }
+    
+    if (urgencyLevel === 'high') {
+      newFilters.availability = 'available';
+    }
+    
+    setFilters(newFilters);
     
     setTimeout(() => {
       setIsSubmitting(false);
       
       toast({
         title: "Tutoring request submitted!",
-        description: `We've found ${matchedTutors.length} tutors that match your request.`,
+        description: `We're matching you with tutors based on your request.`,
       });
     }, 1000);
   };
 
-  const findMatchingTutors = () => {
-    // Match tutors by subject and communication preferences
-    return tutors.filter(tutor => {
-      // Match by subject
-      const subjectMatch = tutor.specialty.toLowerCase() === selectedSubject.toLowerCase() ||
-        tutor.expertise.some(exp => exp.toLowerCase().includes(selectedSubject.toLowerCase()));
-      
-      // Match by communication preference if any selected
-      const commMatch = !Object.values(commPreferences).some(Boolean) || 
-        (commPreferences.text && tutor.communicationModes.includes('text')) ||
-        (commPreferences.voice && tutor.communicationModes.includes('voice')) ||
-        (commPreferences.video && tutor.communicationModes.includes('video'));
-      
-      // Prioritize available tutors if urgency is high
-      const urgencyMatch = urgencyLevel !== 'high' || tutor.status === 'available';
-      
-      return subjectMatch && commMatch && urgencyMatch;
-    });
-  };
-
   const handleFilterChange = (subject: string) => {
     if (subject === "all") {
-      setFilteredTutors(tutors);
+      setFilters({});
       return;
     }
     
-    setIsSearching(true);
-    
-    setTimeout(() => {
-      const filtered = tutors.filter(tutor => 
-        tutor.specialty.toLowerCase() === subject.toLowerCase() ||
-        tutor.expertise.some(exp => exp.toLowerCase().includes(subject.toLowerCase()))
-      );
-      setFilteredTutors(filtered);
-      setIsSearching(false);
-    }, 500);
+    setFilters(prev => ({
+      ...prev,
+      subject
+    }));
   };
 
   const toggleCommPreference = (type: 'text' | 'voice' | 'video') => {
@@ -278,18 +261,48 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
               </div>
             </div>
             <CardDescription>
-              {isSearching ? "Searching for tutors..." : 
+              {isLoading ? "Loading tutors..." : 
                 `Showing ${filteredTutors.length} tutor${filteredTutors.length !== 1 ? 's' : ''}`}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {filteredTutors.length === 0 ? (
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex gap-4 p-4 border rounded-lg">
+                    <Skeleton className="h-16 w-16 rounded-full" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-[200px]" />
+                      <Skeleton className="h-4 w-[150px]" />
+                      <div className="flex gap-2">
+                        <Skeleton className="h-3 w-[60px]" />
+                        <Skeleton className="h-3 w-[80px]" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-9 w-[100px]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-8">
+                <p className="text-destructive">Error loading tutors: {error}</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => setFilters({})}
+                >
+                  Try again
+                </Button>
+              </div>
+            ) : filteredTutors.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">No tutors found matching your criteria.</p>
                 <Button 
                   variant="outline" 
                   className="mt-4"
-                  onClick={() => setFilteredTutors(tutors)}
+                  onClick={() => setFilters({})}
                 >
                   Show all tutors
                 </Button>

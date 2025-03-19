@@ -8,101 +8,17 @@ import FindTutorTab from '@/components/tutor/FindTutorTab';
 import SessionsTab from '@/components/tutor/SessionsTab';
 import TutorLeaderboard from '@/components/tutor/TutorLeaderboard';
 import { Tutor } from '@/types/tutor';
-import { Session } from '@/types/session';
 import { Badge } from '@/components/ui/badge';
 import { Star, ArrowUp } from 'lucide-react';
+import { useTutors } from '@/hooks/useTutors';
 
 const TutorConnection = () => {
   const [activeTab, setActiveTab] = useState('find-tutor');
+  const { tutors } = useTutors(); // Get tutors from our hook
   
-  // Mock data for tutors
-  const tutors: Tutor[] = [
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      specialty: "Physics",
-      expertise: ["Mechanics", "Electromagnetism", "Optics"],
-      rating: 4.9,
-      reviews: 128,
-      status: "available",
-      avatar: "SJ",
-      level: 24,
-      badges: ["Top Physics Tutor", "Session Expert"],
-      communicationModes: ["text", "voice", "video"]
-    },
-    {
-      id: 2,
-      name: "Prof. Michael Chen",
-      specialty: "Chemistry",
-      expertise: ["Organic Chemistry", "Chemical Bonding", "Thermodynamics"],
-      rating: 4.8,
-      reviews: 95,
-      status: "busy",
-      availableIn: "30 minutes",
-      avatar: "MC",
-      level: 18,
-      badges: ["Chemistry Wizard"],
-      communicationModes: ["text", "voice"]
-    },
-    {
-      id: 3,
-      name: "Dr. Emily Peterson",
-      specialty: "Biology",
-      expertise: ["Cell Biology", "Genetics", "Human Physiology"],
-      rating: 4.7,
-      reviews: 112,
-      status: "available",
-      avatar: "EP",
-      level: 21,
-      badges: ["Biology Master", "Patient Teacher"],
-      communicationModes: ["text", "voice", "video"]
-    },
-    {
-      id: 4,
-      name: "Prof. David Williams",
-      specialty: "Mathematics",
-      expertise: ["Calculus", "Linear Algebra", "Statistics"],
-      rating: 4.9,
-      reviews: 143,
-      status: "scheduled",
-      nextSession: "Tomorrow, 3:00 PM",
-      avatar: "DW",
-      level: 32,
-      badges: ["Math Genius", "Top Rated"],
-      communicationModes: ["text", "video"]
-    }
-  ];
-  
-  // Mock data for active sessions
-  const activeSessions: Session[] = [
-    {
-      id: 1,
-      tutorName: "Dr. Sarah Johnson",
-      tutorAvatar: "SJ",
-      subject: "Physics",
-      topic: "Understanding Newton's Laws of Motion",
-      startTime: "Today, 2:00 PM",
-      duration: "45 minutes",
-      status: 'in-progress',
-      mode: 'video'
-    },
-    {
-      id: 2,
-      tutorName: "Prof. Michael Chen",
-      tutorAvatar: "MC",
-      subject: "Chemistry",
-      topic: "Balancing Chemical Equations",
-      startTime: "Tomorrow, 4:00 PM",
-      duration: "60 minutes",
-      status: 'scheduled',
-      mode: 'voice'
-    }
-  ];
-
   // Handler for scheduling a session from the FindTutorTab
   const handleScheduleWithTutor = (tutor: Tutor) => {
-    // This function would be implemented to switch to the sessions tab
-    // and pre-populate the scheduling form with the selected tutor
+    // Switch to the sessions tab
     setActiveTab('sessions');
   };
 
@@ -162,12 +78,12 @@ const TutorConnection = () => {
 
           {/* Find a Tutor Tab */}
           <TabsContent value="find-tutor">
-            <FindTutorTab tutors={tutors} onScheduleWithTutor={handleScheduleWithTutor} />
+            <FindTutorTab onScheduleWithTutor={handleScheduleWithTutor} />
           </TabsContent>
 
           {/* My Sessions Tab */}
           <TabsContent value="sessions">
-            <SessionsTab activeSessions={activeSessions} />
+            <SessionsTab />
           </TabsContent>
 
           {/* Tutor Leaderboard Tab */}
