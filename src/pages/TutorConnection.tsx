@@ -7,10 +7,9 @@ import TextToSpeech from '@/components/accessibility/TextToSpeech';
 import FindTutorTab from '@/components/tutor/FindTutorTab';
 import BecomeTutorTab from '@/components/tutor/BecomeTutorTab';
 import SessionsTab from '@/components/tutor/SessionsTab';
-import ResourcesTab from '@/components/tutor/ResourcesTab';
+import TutorLeaderboard from '@/components/tutor/TutorLeaderboard';
 import { Tutor } from '@/types/tutor';
 import { Session } from '@/types/session';
-import { StudyResource } from '@/types/studyResource';
 
 const TutorConnection = () => {
   const [activeTab, setActiveTab] = useState('find-tutor');
@@ -98,50 +97,6 @@ const TutorConnection = () => {
       mode: "voice"
     }
   ];
-  
-  // Mock data for study resources
-  const studyResources: StudyResource[] = [
-    {
-      id: 1,
-      title: "Physics Formula Sheet",
-      type: "PDF",
-      subject: "Physics",
-      uploadedBy: "Dr. Sarah Johnson",
-      downloadCount: 235,
-      size: "1.2 MB",
-      uploadDate: "Oct 12, 2023"
-    },
-    {
-      id: 2,
-      title: "Organic Chemistry Reaction Guide",
-      type: "PDF",
-      subject: "Chemistry",
-      uploadedBy: "Prof. Michael Chen",
-      downloadCount: 189,
-      size: "2.4 MB",
-      uploadDate: "Oct 10, 2023"
-    },
-    {
-      id: 3,
-      title: "Introduction to Cell Biology",
-      type: "Video",
-      subject: "Biology",
-      uploadedBy: "Dr. Emily Peterson",
-      downloadCount: 312,
-      duration: "45:20",
-      uploadDate: "Oct 8, 2023"
-    },
-    {
-      id: 4,
-      title: "Linear Algebra Explained",
-      type: "Video",
-      subject: "Mathematics",
-      uploadedBy: "Prof. David Williams",
-      downloadCount: 276,
-      duration: "58:15",
-      uploadDate: "Oct 5, 2023"
-    }
-  ];
 
   return (
     <DashboardLayout>
@@ -173,10 +128,10 @@ const TutorConnection = () => {
               My Sessions
             </TabsTrigger>
             <TabsTrigger 
-              value="resources" 
-              onClick={() => setActiveTab('resources')}
+              value="leaderboard" 
+              onClick={() => setActiveTab('leaderboard')}
             >
-              Learning Resources
+              Tutor Leaderboard
             </TabsTrigger>
           </TabsList>
 
@@ -195,9 +150,9 @@ const TutorConnection = () => {
             <SessionsTab activeSessions={activeSessions} />
           </TabsContent>
 
-          {/* Learning Resources Tab */}
-          <TabsContent value="resources">
-            <ResourcesTab studyResources={studyResources} />
+          {/* Tutor Leaderboard Tab */}
+          <TabsContent value="leaderboard">
+            <TutorLeaderboard tutors={tutors} />
           </TabsContent>
         </Tabs>
       </FadeIn>
