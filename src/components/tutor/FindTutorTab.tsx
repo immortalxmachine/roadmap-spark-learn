@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,8 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { MessageCircle, Phone, Video, Calendar, Star, GraduationCap, Award, Upload, Search, Filter, Heart } from 'lucide-react';
-import AnimatedAvatar from '@/components/ui/avatar-animated';
+import { MessageCircle, Phone, Video, Calendar, Search, Filter, Upload } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { subjects } from '@/data/subjects';
 import TutorCard from './TutorCard';
@@ -22,6 +21,7 @@ interface FindTutorTabProps {
 
 const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor }) => {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [urgencyLevel, setUrgencyLevel] = useState<string>("");
   const [question, setQuestion] = useState<string>("");
   const [commPreferences, setCommPreferences] = useState<{ 
@@ -30,7 +30,31 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
     video: boolean 
   }>({ text: false, voice: false, video: false });
   const [filteredTutors, setFilteredTutors] = useState<Tutor[]>(tutors);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
+
+  // When tutors prop changes, update the filtered tutors
+  useEffect(() => {
+    setFilteredTutors(tutors);
+  }, [tutors]);
+
+  // Update filtered tutors when search query changes
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredTutors(tutors);
+      return;
+    }
+    
+    const lowercaseQuery = searchQuery.toLowerCase();
+    const results = tutors.filter(tutor => 
+      tutor.name.toLowerCase().includes(lowercaseQuery) ||
+      tutor.specialty.toLowerCase().includes(lowercaseQuery) ||
+      tutor.expertise.some(skill => skill.toLowerCase().includes(lowercaseQuery))
+    );
+    
+    setFilteredTutors(results);
+  }, [searchQuery, tutors]);
 
   const handleSubmitRequest = () => {
     if (!selectedSubject || !question) {
@@ -42,8 +66,25 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
       return;
     }
 
-    // Filter tutors based on subject and communication preferences
-    const matchedTutors = tutors.filter(tutor => {
+    setIsSubmitting(true);
+    
+    // Find the best matching tutors
+    const matchedTutors = findMatchingTutors();
+    setFilteredTutors(matchedTutors.length > 0 ? matchedTutors : tutors);
+    
+    setTimeout(() => {
+      setIsSubmitting(false);
+      
+      toast({
+        title: "Tutoring request submitted!",
+        description: `We've found ${matchedTutors.length} tutors that match your request.`,
+      });
+    }, 1000);
+  };
+
+  const findMatchingTutors = () => {
+    // Match tutors by subject and communication preferences
+    return tutors.filter(tutor => {
       // Match by subject
       const subjectMatch = tutor.specialty.toLowerCase() === selectedSubject.toLowerCase() ||
         tutor.expertise.some(exp => exp.toLowerCase().includes(selectedSubject.toLowerCase()));
@@ -54,14 +95,10 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
         (commPreferences.voice && tutor.communicationModes.includes('voice')) ||
         (commPreferences.video && tutor.communicationModes.includes('video'));
       
-      return subjectMatch && commMatch;
-    });
-
-    setFilteredTutors(matchedTutors.length > 0 ? matchedTutors : tutors);
-
-    toast({
-      title: "Tutoring request submitted!",
-      description: "We'll match you with a tutor shortly.",
+      // Prioritize available tutors if urgency is high
+      const urgencyMatch = urgencyLevel !== 'high' || tutor.status === 'available';
+      
+      return subjectMatch && commMatch && urgencyMatch;
     });
   };
 
@@ -71,11 +108,16 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
       return;
     }
     
-    const filtered = tutors.filter(tutor => 
-      tutor.specialty.toLowerCase() === subject.toLowerCase() ||
-      tutor.expertise.some(exp => exp.toLowerCase().includes(subject.toLowerCase()))
-    );
-    setFilteredTutors(filtered);
+    setIsSearching(true);
+    
+    setTimeout(() => {
+      const filtered = tutors.filter(tutor => 
+        tutor.specialty.toLowerCase() === subject.toLowerCase() ||
+        tutor.expertise.some(exp => exp.toLowerCase().includes(subject.toLowerCase()))
+      );
+      setFilteredTutors(filtered);
+      setIsSearching(false);
+    }, 500);
   };
 
   const toggleCommPreference = (type: 'text' | 'voice' | 'video') => {
@@ -83,6 +125,10 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
       ...prev,
       [type]: !prev[type]
     }));
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -194,8 +240,9 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
                 type="button" 
                 className="w-full" 
                 onClick={handleSubmitRequest}
+                disabled={isSubmitting}
               >
-                Submit Tutoring Request
+                {isSubmitting ? "Finding tutors..." : "Submit Tutoring Request"}
               </Button>
             </form>
           </CardContent>
@@ -207,10 +254,14 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
               <CardTitle>Available Tutors</CardTitle>
-              <div className="flex items-center">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 mr-2">
-                  <Filter className="h-4 w-4" />
-                </Button>
+              <div className="flex items-center space-x-2">
+                <Input
+                  type="search"
+                  placeholder="Search tutors..."
+                  className="h-8 w-[180px]"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
                 <Select onValueChange={handleFilterChange}>
                   <SelectTrigger className="w-[160px] h-8">
                     <SelectValue placeholder="Filter by subject" />
@@ -227,19 +278,33 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
               </div>
             </div>
             <CardDescription>
-              Browse and connect with our volunteer tutors
+              {isSearching ? "Searching for tutors..." : 
+                `Showing ${filteredTutors.length} tutor${filteredTutors.length !== 1 ? 's' : ''}`}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {filteredTutors.map((tutor) => (
-                <TutorCard 
-                  key={tutor.id} 
-                  tutor={tutor} 
-                  onSchedule={onScheduleWithTutor}
-                />
-              ))}
-            </div>
+            {filteredTutors.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No tutors found matching your criteria.</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => setFilteredTutors(tutors)}
+                >
+                  Show all tutors
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredTutors.map((tutor) => (
+                  <TutorCard 
+                    key={tutor.id} 
+                    tutor={tutor} 
+                    onSchedule={onScheduleWithTutor}
+                  />
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
