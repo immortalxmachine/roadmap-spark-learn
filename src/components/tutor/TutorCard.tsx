@@ -5,13 +5,35 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MessageCircle, Phone, Video, Calendar, Star, GraduationCap, Award } from 'lucide-react';
 import AnimatedAvatar from '@/components/ui/avatar-animated';
+import { useToast } from "@/hooks/use-toast";
 import { Tutor } from '@/types/tutor';
 
 interface TutorCardProps {
   tutor: Tutor;
+  onSchedule?: (tutor: Tutor) => void;
 }
 
-const TutorCard: React.FC<TutorCardProps> = ({ tutor }) => {
+const TutorCard: React.FC<TutorCardProps> = ({ tutor, onSchedule }) => {
+  const { toast } = useToast();
+
+  const handleMessage = () => {
+    toast({
+      title: "Message sent",
+      description: `Your message has been sent to ${tutor.name}.`,
+    });
+  };
+
+  const handleSchedule = () => {
+    toast({
+      title: "Schedule session",
+      description: `Setting up a session with ${tutor.name}.`,
+    });
+    
+    if (onSchedule) {
+      onSchedule(tutor);
+    }
+  };
+
   return (
     <Card key={tutor.id} className="overflow-hidden">
       <CardContent className="p-6">
@@ -106,11 +128,11 @@ const TutorCard: React.FC<TutorCardProps> = ({ tutor }) => {
             </div>
             
             <div className="flex space-x-2">
-              <Button className="flex-1">
+              <Button className="flex-1" onClick={handleMessage}>
                 <MessageCircle className="mr-2 h-4 w-4" />
                 Message
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" className="flex-1" onClick={handleSchedule}>
                 <Calendar className="mr-2 h-4 w-4" />
                 Schedule
               </Button>

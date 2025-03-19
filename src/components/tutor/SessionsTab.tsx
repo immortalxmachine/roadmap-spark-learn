@@ -11,19 +11,26 @@ import AnimatedAvatar from '@/components/ui/avatar-animated';
 import { useToast } from "@/hooks/use-toast";
 import { subjects } from '@/data/subjects';
 import { Session } from '@/types/session';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { CalendarIcon } from 'lucide-react';
 
 interface SessionsTabProps {
   activeSessions: Session[];
 }
 
-const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions }) => {
+const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessions }) => {
   const [message, setMessage] = useState('');
   const { toast } = useToast();
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [date, setDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedDuration, setSelectedDuration] = useState<string>('');
   const [selectedSessionType, setSelectedSessionType] = useState<'text' | 'voice' | 'video'>('video');
   const [selectedSubject, setSelectedSubject] = useState<string>('');
+  const [topic, setTopic] = useState<string>('');
+  const [activeSessions, setActiveSessions] = useState<Session[]>(initialSessions);
   
   // Handler for sending a message
   const handleSendMessage = () => {
@@ -42,13 +49,15 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions }) => {
       description: "Connecting to your tutoring session...",
     });
     
-    // In a real application, this would redirect to the session room or open a modal
-    window.open(`/session/${sessionId}`, '_blank');
+    // In a real application, this would redirect to the session room
+    setTimeout(() => {
+      window.open(`/session/${sessionId}`, '_blank');
+    }, 1000);
   };
   
   // Handler for scheduling a new session
   const handleScheduleSession = () => {
-    if (!selectedSubject || !selectedDate || !selectedTime || !selectedDuration) {
+    if (!selectedSubject || !date || !selectedTime || !selectedDuration || !topic) {
       toast({
         title: "Missing information",
         description: "Please fill out all required fields to schedule a session.",
@@ -57,17 +66,45 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions }) => {
       return;
     }
     
+    // Create a new session
+    const newSession: Session = {
+      id: Math.floor(Math.random() * 1000) + activeSessions.length + 1,
+      tutorName: "Dr. Sarah Johnson", // Using a default tutor for demonstration
+      tutorAvatar: "SJ",
+      subject: selectedSubject,
+      topic: topic,
+      startTime: `${format(date, 'PPP')}, ${selectedTime}`,
+      duration: `${selectedDuration} minutes`,
+      status: 'scheduled',
+      mode: selectedSessionType
+    };
+    
+    // Add the new session to the list
+    setActiveSessions([...activeSessions, newSession]);
+    
     toast({
       title: "Session scheduled!",
-      description: `Your ${selectedDuration} minute ${selectedSessionType} session has been scheduled.`,
+      description: `Your ${selectedDuration} minute ${selectedSessionType} session has been scheduled for ${format(date, 'PPP')} at ${selectedTime}.`,
     });
     
     // Reset form
     setSelectedSubject('');
-    setSelectedDate('');
+    setDate(undefined);
     setSelectedTime('');
     setSelectedDuration('');
+    setTopic('');
     setSelectedSessionType('video');
+  };
+  
+  // Handler for canceling a session
+  const handleCancelSession = (sessionId: number) => {
+    toast({
+      title: "Session canceled",
+      description: "Your session has been canceled.",
+    });
+    
+    // Remove the session from the list
+    setActiveSessions(activeSessions.filter(session => session.id !== sessionId));
   };
   
   // Handler for adding session to calendar
@@ -78,10 +115,11 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions }) => {
     });
     
     // In a real application, this would generate an iCal file or integrate with calendar APIs
+    // For demo purposes, we'll just show the toast
   };
   
   // Get current date in YYYY-MM-DD format for the date input min value
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date();
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -147,7 +185,7 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions }) => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 flex-wrap">
                         {session.status === 'in-progress' ? (
                           <>
                             <Badge className="bg-green-500">In Progress</Badge>
@@ -155,12 +193,22 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions }) => {
                               Join Now
                             </Button>
                           </>
-                        ) : (
+                        ) : session.status === 'scheduled' ? (
                           <>
                             <Badge variant="outline">Scheduled</Badge>
                             <Button variant="outline" onClick={() => handleAddToCalendar(session)}>
                               <Calendar className="mr-2 h-4 w-4" />
                               Add to Calendar
+                            </Button>
+                            <Button variant="destructive" onClick={() => handleCancelSession(session.id)}>
+                              Cancel
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Badge variant="secondary">Completed</Badge>
+                            <Button variant="outline">
+                              Review
                             </Button>
                           </>
                         )}
@@ -267,20 +315,61 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions }) => {
               </div>
               
               <div className="space-y-2">
-                <Label>Date & Time</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Input 
-                    type="date" 
-                    min={today}
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                  />
-                  <Input 
-                    type="time" 
-                    value={selectedTime}
-                    onChange={(e) => setSelectedTime(e.target.value)}
-                  />
-                </div>
+                <Label>Topic</Label>
+                <Input 
+                  placeholder="What do you need help with?"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      disabled={(date) => date < today}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Time</Label>
+                <Select value={selectedTime} onValueChange={setSelectedTime}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="09:00 AM">09:00 AM</SelectItem>
+                    <SelectItem value="10:00 AM">10:00 AM</SelectItem>
+                    <SelectItem value="11:00 AM">11:00 AM</SelectItem>
+                    <SelectItem value="12:00 PM">12:00 PM</SelectItem>
+                    <SelectItem value="01:00 PM">01:00 PM</SelectItem>
+                    <SelectItem value="02:00 PM">02:00 PM</SelectItem>
+                    <SelectItem value="03:00 PM">03:00 PM</SelectItem>
+                    <SelectItem value="04:00 PM">04:00 PM</SelectItem>
+                    <SelectItem value="05:00 PM">05:00 PM</SelectItem>
+                    <SelectItem value="06:00 PM">06:00 PM</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-2">

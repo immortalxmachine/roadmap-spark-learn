@@ -17,9 +17,10 @@ import { Tutor } from '@/types/tutor';
 
 interface FindTutorTabProps {
   tutors: Tutor[];
+  onScheduleWithTutor?: (tutor: Tutor) => void;
 }
 
-const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors }) => {
+const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor }) => {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [urgencyLevel, setUrgencyLevel] = useState<string>("");
   const [question, setQuestion] = useState<string>("");
@@ -232,7 +233,11 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors }) => {
           <CardContent>
             <div className="space-y-4">
               {filteredTutors.map((tutor) => (
-                <TutorCard key={tutor.id} tutor={tutor} />
+                <TutorCard 
+                  key={tutor.id} 
+                  tutor={tutor} 
+                  onSchedule={onScheduleWithTutor}
+                />
               ))}
             </div>
           </CardContent>

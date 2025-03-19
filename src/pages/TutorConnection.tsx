@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -96,6 +97,13 @@ const TutorConnection = () => {
     }
   ];
 
+  // Handler for scheduling a session from the FindTutorTab
+  const handleScheduleWithTutor = (tutor: Tutor) => {
+    // This function would be implemented to switch to the sessions tab
+    // and pre-populate the scheduling form with the selected tutor
+    setActiveTab('sessions');
+  };
+
   return (
     <DashboardLayout>
       <FadeIn direction="up">
@@ -105,7 +113,7 @@ const TutorConnection = () => {
           <TextToSpeech text="Volunteer Tutor Connection. Connect with volunteer tutors to get help with your studies" />
         </div>
 
-        <Tabs defaultValue="find-tutor" className="mb-6">
+        <Tabs defaultValue="find-tutor" className="mb-6" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-3 mb-6">
             <TabsTrigger 
               value="find-tutor" 
@@ -129,7 +137,7 @@ const TutorConnection = () => {
 
           {/* Find a Tutor Tab */}
           <TabsContent value="find-tutor">
-            <FindTutorTab tutors={tutors} />
+            <FindTutorTab tutors={tutors} onScheduleWithTutor={handleScheduleWithTutor} />
           </TabsContent>
 
           {/* My Sessions Tab */}
