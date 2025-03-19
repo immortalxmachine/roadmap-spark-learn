@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { MessageCircle, Phone, Video, Calendar, Clock, Users, BookOpen, Brain, Send, Star, GraduationCap, Award, Upload, Search, FileText, Filter } from 'lucide-react';
+import { MessageCircle, Phone, Video, Calendar, Clock, Users, BookOpen, Brain, Send, Star, GraduationCap, Award, Upload, Search, FileText, Filter, Heart } from 'lucide-react';
 import TextToSpeech from '@/components/accessibility/TextToSpeech';
 import FadeIn from '@/components/animations/FadeIn';
 import AnimatedAvatar from '@/components/ui/avatar-animated';
