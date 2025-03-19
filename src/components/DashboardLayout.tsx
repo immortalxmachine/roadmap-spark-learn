@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { BookOpen, Brain, Award, FileText, Users, MessageCircle, Settings, BarChart3, Heart, Volume2, VolumeX, Eye, EyeOff } from 'lucide-react';
+import { BookOpen, Brain, Award, FileText, Users, MessageCircle, Settings, BarChart3, Headphones, Volume2, VolumeX, Eye, EyeOff } from 'lucide-react';
 import AnimatedAvatar from './ui/avatar-animated';
 import { ScrollArea } from './ui/scroll-area';
 import { Separator } from './ui/separator';
@@ -57,8 +57,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     },
     { 
       path: '/support', 
-      label: 'Crisis Support', 
-      icon: Heart,
+      label: 'Tutor Connection', 
+      icon: Headphones,
       notification: false
     },
     { 
