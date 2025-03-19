@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -82,8 +83,8 @@ const TutorConnection = () => {
       topic: "Understanding Newton's Laws of Motion",
       startTime: "Today, 2:00 PM",
       duration: "45 minutes",
-      status: "in-progress",
-      mode: "video"
+      status: 'in-progress',
+      mode: 'video'
     },
     {
       id: 2,
@@ -93,8 +94,8 @@ const TutorConnection = () => {
       topic: "Balancing Chemical Equations",
       startTime: "Tomorrow, 4:00 PM",
       duration: "60 minutes",
-      status: "scheduled",
-      mode: "voice"
+      status: 'scheduled',
+      mode: 'voice'
     }
   ];
 

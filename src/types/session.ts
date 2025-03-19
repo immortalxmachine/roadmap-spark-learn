@@ -9,4 +9,6 @@ export interface Session {
   duration: string;
   status: 'scheduled' | 'in-progress' | 'completed';
   mode: 'text' | 'voice' | 'video';
+  rating?: number; // 1-5 star rating
+  feedback?: string; // User feedback for the session
 }

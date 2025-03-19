@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,18 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { MessageCircle, Phone, Video, Calendar, Clock, Send } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  MessageCircle, 
+  Phone, 
+  Video, 
+  Calendar, 
+  Clock, 
+  Send, 
+  Star, 
+  History,
+  FileText
+} from 'lucide-react';
 import AnimatedAvatar from '@/components/ui/avatar-animated';
 import { useToast } from "@/hooks/use-toast";
 import { subjects } from '@/data/subjects';
@@ -16,6 +26,8 @@ import { format } from 'date-fns';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Slider } from '@/components/ui/slider';
 
 interface SessionsTabProps {
   activeSessions: Session[];
@@ -31,8 +43,41 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [topic, setTopic] = useState<string>('');
   const [activeSessions, setActiveSessions] = useState<Session[]>(initialSessions);
-  
-  // Handler for sending a message
+  const [sessionFilter, setSessionFilter] = useState<'upcoming' | 'past'>('upcoming');
+  const [reviewData, setReviewData] = useState<{ rating: number; feedback: string }>({
+    rating: 3,
+    feedback: '',
+  });
+  const [sessionBeingReviewed, setSessionBeingReviewed] = useState<number | null>(null);
+
+  const [pastSessions, setPastSessions] = useState<Session[]>([
+    {
+      id: 101,
+      tutorName: "Prof. David Williams",
+      tutorAvatar: "DW",
+      subject: "Mathematics",
+      topic: "Algebra Fundamentals",
+      startTime: "May 12, 2023, 11:00 AM",
+      duration: "60 minutes",
+      status: 'completed',
+      mode: 'video',
+      rating: 5,
+      feedback: "Excellent session! The tutor explained concepts very clearly."
+    },
+    {
+      id: 102,
+      tutorName: "Dr. Emily Peterson",
+      tutorAvatar: "EP",
+      subject: "Biology",
+      topic: "Cell Structure and Function",
+      startTime: "April 28, 2023, 02:00 PM",
+      duration: "45 minutes",
+      status: 'completed',
+      mode: 'text',
+      rating: 4
+    }
+  ]);
+
   const handleSendMessage = () => {
     if (message.trim() === '') return;
     toast({
@@ -41,21 +86,18 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
     });
     setMessage('');
   };
-  
-  // Handler for joining a session
+
   const handleJoinSession = (sessionId: number) => {
     toast({
       title: "Joining session",
       description: "Connecting to your tutoring session...",
     });
     
-    // In a real application, this would redirect to the session room
     setTimeout(() => {
       window.open(`/session/${sessionId}`, '_blank');
     }, 1000);
   };
-  
-  // Handler for scheduling a new session
+
   const handleScheduleSession = () => {
     if (!selectedSubject || !date || !selectedTime || !selectedDuration || !topic) {
       toast({
@@ -66,10 +108,9 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
       return;
     }
     
-    // Create a new session
     const newSession: Session = {
       id: Math.floor(Math.random() * 1000) + activeSessions.length + 1,
-      tutorName: "Dr. Sarah Johnson", // Using a default tutor for demonstration
+      tutorName: "Dr. Sarah Johnson",
       tutorAvatar: "SJ",
       subject: selectedSubject,
       topic: topic,
@@ -79,7 +120,6 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
       mode: selectedSessionType
     };
     
-    // Add the new session to the list
     setActiveSessions([...activeSessions, newSession]);
     
     toast({
@@ -87,7 +127,6 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
       description: `Your ${selectedDuration} minute ${selectedSessionType} session has been scheduled for ${format(date, 'PPP')} at ${selectedTime}.`,
     });
     
-    // Reset form
     setSelectedSubject('');
     setDate(undefined);
     setSelectedTime('');
@@ -95,32 +134,72 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
     setTopic('');
     setSelectedSessionType('video');
   };
-  
-  // Handler for canceling a session
+
   const handleCancelSession = (sessionId: number) => {
     toast({
       title: "Session canceled",
       description: "Your session has been canceled.",
     });
     
-    // Remove the session from the list
     setActiveSessions(activeSessions.filter(session => session.id !== sessionId));
   };
-  
-  // Handler for adding session to calendar
+
   const handleAddToCalendar = (session: Session) => {
     toast({
       title: "Added to calendar",
       description: `${session.topic} with ${session.tutorName} has been added to your calendar.`,
     });
-    
-    // In a real application, this would generate an iCal file or integrate with calendar APIs
-    // For demo purposes, we'll just show the toast
   };
-  
-  // Get current date in YYYY-MM-DD format for the date input min value
+
+  const handleSubmitReview = (sessionId: number) => {
+    if (!sessionBeingReviewed) return;
+
+    setPastSessions(prevSessions => 
+      prevSessions.map(session => 
+        session.id === sessionId 
+          ? { ...session, rating: reviewData.rating, feedback: reviewData.feedback }
+          : session
+      )
+    );
+
+    setSessionBeingReviewed(null);
+    setReviewData({ rating: 3, feedback: '' });
+
+    toast({
+      title: "Review submitted",
+      description: "Thank you for your feedback!",
+    });
+  };
+
+  const handleStartReview = (sessionId: number) => {
+    const session = pastSessions.find(s => s.id === sessionId);
+    setSessionBeingReviewed(sessionId);
+    
+    if (session) {
+      setReviewData({
+        rating: session.rating || 3,
+        feedback: session.feedback || '',
+      });
+    }
+  };
+
+  const renderStarRating = (rating: number | undefined) => {
+    if (!rating) return "Not rated";
+    
+    return (
+      <div className="flex items-center">
+        {[...Array(5)].map((_, index) => (
+          <Star 
+            key={index} 
+            className={`h-4 w-4 ${index < rating ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} 
+          />
+        ))}
+      </div>
+    );
+  };
+
   const today = new Date();
-  
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2">
@@ -137,94 +216,235 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
           <CardContent className="p-0">
             <div className="border-b">
               <div className="flex border-b">
-                <button className="flex-1 px-4 py-2 text-sm font-medium text-center border-b-2 border-primary text-primary">
+                <button 
+                  className={`flex-1 px-4 py-2 text-sm font-medium text-center ${
+                    sessionFilter === 'upcoming' 
+                      ? 'border-b-2 border-primary text-primary' 
+                      : 'text-muted-foreground'
+                  }`}
+                  onClick={() => setSessionFilter('upcoming')}
+                >
                   Active & Upcoming
                 </button>
-                <button className="flex-1 px-4 py-2 text-sm font-medium text-center text-muted-foreground">
+                <button 
+                  className={`flex-1 px-4 py-2 text-sm font-medium text-center ${
+                    sessionFilter === 'past' 
+                      ? 'border-b-2 border-primary text-primary' 
+                      : 'text-muted-foreground'
+                  }`}
+                  onClick={() => setSessionFilter('past')}
+                >
+                  <History className="h-4 w-4 inline mr-1" />
                   Past Sessions
                 </button>
               </div>
             </div>
             
-            <div className="divide-y">
-              {activeSessions.length > 0 ? (
-                activeSessions.map((session) => (
-                  <div key={session.id} className="p-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="flex items-start space-x-4">
-                        <AnimatedAvatar 
-                          fallback={session.tutorAvatar} 
-                          size="md" 
-                          animation={session.status === 'in-progress' ? 'pulse' : 'none'}
-                          className={session.status === 'in-progress' ? 'ring-2 ring-green-500' : ''}
-                        />
-                        <div>
-                          <h3 className="font-medium">{session.topic}</h3>
-                          <p className="text-sm text-muted-foreground mb-1">
-                            with {session.tutorName} • {session.subject}
-                          </p>
-                          <div className="flex flex-wrap gap-3 text-sm">
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                              {session.startTime}
-                            </div>
-                            <div className="flex items-center">
-                              <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                              {session.duration}
-                            </div>
-                            <div className="flex items-center">
-                              {session.mode === 'video' ? (
-                                <Video className="h-4 w-4 mr-1 text-muted-foreground" />
-                              ) : session.mode === 'voice' ? (
-                                <Phone className="h-4 w-4 mr-1 text-muted-foreground" />
-                              ) : (
-                                <MessageCircle className="h-4 w-4 mr-1 text-muted-foreground" />
-                              )}
-                              {session.mode.charAt(0).toUpperCase() + session.mode.slice(1)} Session
+            {sessionFilter === 'upcoming' && (
+              <div className="divide-y">
+                {activeSessions.length > 0 ? (
+                  activeSessions.map((session) => (
+                    <div key={session.id} className="p-6">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-start space-x-4">
+                          <AnimatedAvatar 
+                            fallback={session.tutorAvatar} 
+                            size="md" 
+                            animation={session.status === 'in-progress' ? 'pulse' : 'none'}
+                            className={session.status === 'in-progress' ? 'ring-2 ring-green-500' : ''}
+                          />
+                          <div>
+                            <h3 className="font-medium">{session.topic}</h3>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              with {session.tutorName} • {session.subject}
+                            </p>
+                            <div className="flex flex-wrap gap-3 text-sm">
+                              <div className="flex items-center">
+                                <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
+                                {session.startTime}
+                              </div>
+                              <div className="flex items-center">
+                                <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
+                                {session.duration}
+                              </div>
+                              <div className="flex items-center">
+                                {session.mode === 'video' ? (
+                                  <Video className="h-4 w-4 mr-1 text-muted-foreground" />
+                                ) : session.mode === 'voice' ? (
+                                  <Phone className="h-4 w-4 mr-1 text-muted-foreground" />
+                                ) : (
+                                  <MessageCircle className="h-4 w-4 mr-1 text-muted-foreground" />
+                                )}
+                                {session.mode.charAt(0).toUpperCase() + session.mode.slice(1)} Session
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2 flex-wrap">
-                        {session.status === 'in-progress' ? (
-                          <>
-                            <Badge className="bg-green-500">In Progress</Badge>
-                            <Button onClick={() => handleJoinSession(session.id)}>
-                              Join Now
-                            </Button>
-                          </>
-                        ) : session.status === 'scheduled' ? (
-                          <>
-                            <Badge variant="outline">Scheduled</Badge>
-                            <Button variant="outline" onClick={() => handleAddToCalendar(session)}>
-                              <Calendar className="mr-2 h-4 w-4" />
-                              Add to Calendar
-                            </Button>
-                            <Button variant="destructive" onClick={() => handleCancelSession(session.id)}>
-                              Cancel
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Badge variant="secondary">Completed</Badge>
-                            <Button variant="outline">
-                              Review
-                            </Button>
-                          </>
-                        )}
+                        <div className="flex items-center space-x-2 flex-wrap">
+                          {session.status === 'in-progress' ? (
+                            <>
+                              <Badge className="bg-green-500">In Progress</Badge>
+                              <Button onClick={() => handleJoinSession(session.id)}>
+                                Join Now
+                              </Button>
+                            </>
+                          ) : session.status === 'scheduled' ? (
+                            <>
+                              <Badge variant="outline">Scheduled</Badge>
+                              <Button variant="outline" onClick={() => handleAddToCalendar(session)}>
+                                <Calendar className="mr-2 h-4 w-4" />
+                                Add to Calendar
+                              </Button>
+                              <Button variant="destructive" onClick={() => handleCancelSession(session.id)}>
+                                Cancel
+                              </Button>
+                            </>
+                          ) : null}
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center">
+                    <p className="text-muted-foreground">You don't have any active sessions yet.</p>
+                    <Button className="mt-4" onClick={() => document.getElementById('schedule-session')?.scrollIntoView({ behavior: 'smooth' })}>
+                      Schedule Your First Session
+                    </Button>
                   </div>
-                ))
-              ) : (
-                <div className="p-8 text-center">
-                  <p className="text-muted-foreground">You don't have any active sessions yet.</p>
-                  <Button className="mt-4" onClick={() => document.getElementById('schedule-session')?.scrollIntoView({ behavior: 'smooth' })}>
-                    Schedule Your First Session
-                  </Button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
+            
+            {sessionFilter === 'past' && (
+              <div className="p-6">
+                {pastSessions.length > 0 ? (
+                  <div className="space-y-8">
+                    {sessionBeingReviewed && (
+                      <div className="bg-secondary/30 p-6 rounded-lg border mb-6">
+                        <h3 className="text-lg font-medium mb-4">Rate Your Session</h3>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>Rating</Label>
+                            <div className="flex items-center space-x-2">
+                              <Slider 
+                                value={[reviewData.rating]} 
+                                min={1} 
+                                max={5} 
+                                step={1}
+                                onValueChange={(value) => setReviewData({...reviewData, rating: value[0]})}
+                                className="max-w-[200px]"
+                              />
+                              <div className="flex">
+                                {[...Array(5)].map((_, index) => (
+                                  <Star
+                                    key={index}
+                                    onClick={() => setReviewData({...reviewData, rating: index + 1})}
+                                    className={`h-5 w-5 cursor-pointer ${
+                                      index < reviewData.rating 
+                                        ? "text-amber-500 fill-amber-500" 
+                                        : "text-gray-300"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Feedback (Optional)</Label>
+                            <Textarea 
+                              placeholder="Share your experience with the tutor..."
+                              value={reviewData.feedback}
+                              onChange={(e) => setReviewData({...reviewData, feedback: e.target.value})}
+                            />
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button 
+                              onClick={() => handleSubmitReview(sessionBeingReviewed)}
+                              className="w-full"
+                            >
+                              Submit Review
+                            </Button>
+                            <Button 
+                              variant="outline"
+                              onClick={() => setSessionBeingReviewed(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Topic</TableHead>
+                          <TableHead>Tutor</TableHead>
+                          <TableHead>Date & Time</TableHead>
+                          <TableHead>Duration</TableHead>
+                          <TableHead>Rating</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {pastSessions.map((session) => (
+                          <TableRow key={session.id}>
+                            <TableCell className="font-medium">
+                              <div className="flex items-center">
+                                {session.mode === 'video' ? (
+                                  <Video className="h-4 w-4 mr-2 text-muted-foreground" />
+                                ) : session.mode === 'voice' ? (
+                                  <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                                ) : (
+                                  <MessageCircle className="h-4 w-4 mr-2 text-muted-foreground" />
+                                )}
+                                {session.topic}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <AnimatedAvatar 
+                                  fallback={session.tutorAvatar} 
+                                  size="sm" 
+                                />
+                                <span>{session.tutorName}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{session.startTime}</TableCell>
+                            <TableCell>{session.duration}</TableCell>
+                            <TableCell>
+                              {renderStarRating(session.rating)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {session.rating ? (
+                                <Button variant="ghost" size="sm" className="h-8">
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Notes
+                                </Button>
+                              ) : (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8"
+                                  onClick={() => handleStartReview(session.id)}
+                                >
+                                  <Star className="h-4 w-4 mr-2" />
+                                  Rate
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">You don't have any past sessions yet.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
