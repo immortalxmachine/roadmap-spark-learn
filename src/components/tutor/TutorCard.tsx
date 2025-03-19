@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Phone, Video, Calendar, Star, GraduationCap, Award } from 'lucide-react';
+import { MessageCircle, Phone, Video, CalendarIcon, Star, GraduationCap, Award } from 'lucide-react';
 import AnimatedAvatar from '@/components/ui/avatar-animated';
 import { useToast } from "@/hooks/use-toast";
 import { Tutor } from '@/types/tutor';
@@ -209,7 +208,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ tutor, onSchedule }) => {
                   Message
                 </Button>
                 <Button variant="outline" className="flex-1" onClick={handleSchedule}>
-                  <Calendar className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 h-4 w-4" />
                   Schedule
                 </Button>
               </div>
