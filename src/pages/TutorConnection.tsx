@@ -1,11 +1,9 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FadeIn from '@/components/animations/FadeIn';
 import TextToSpeech from '@/components/accessibility/TextToSpeech';
 import FindTutorTab from '@/components/tutor/FindTutorTab';
-import BecomeTutorTab from '@/components/tutor/BecomeTutorTab';
 import SessionsTab from '@/components/tutor/SessionsTab';
 import TutorLeaderboard from '@/components/tutor/TutorLeaderboard';
 import { Tutor } from '@/types/tutor';
@@ -103,23 +101,17 @@ const TutorConnection = () => {
       <FadeIn direction="up">
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">Volunteer Tutor Connection</h1>
-          <p className="text-muted-foreground">Connect with volunteer tutors or become a tutor to help others</p>
-          <TextToSpeech text="Volunteer Tutor Connection. Connect with volunteer tutors or become a tutor to help others" />
+          <p className="text-muted-foreground">Connect with volunteer tutors to get help with your studies</p>
+          <TextToSpeech text="Volunteer Tutor Connection. Connect with volunteer tutors to get help with your studies" />
         </div>
 
         <Tabs defaultValue="find-tutor" className="mb-6">
-          <TabsList className="grid grid-cols-4 mb-6">
+          <TabsList className="grid grid-cols-3 mb-6">
             <TabsTrigger 
               value="find-tutor" 
               onClick={() => setActiveTab('find-tutor')}
             >
               Find a Tutor
-            </TabsTrigger>
-            <TabsTrigger 
-              value="become-tutor" 
-              onClick={() => setActiveTab('become-tutor')}
-            >
-              Become a Tutor
             </TabsTrigger>
             <TabsTrigger 
               value="sessions" 
@@ -138,11 +130,6 @@ const TutorConnection = () => {
           {/* Find a Tutor Tab */}
           <TabsContent value="find-tutor">
             <FindTutorTab tutors={tutors} />
-          </TabsContent>
-
-          {/* Become a Tutor Tab */}
-          <TabsContent value="become-tutor">
-            <BecomeTutorTab topTutors={tutors} />
           </TabsContent>
 
           {/* My Sessions Tab */}
