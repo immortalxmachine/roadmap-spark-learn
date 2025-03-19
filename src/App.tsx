@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import DigitalLibrary from "./pages/DigitalLibrary";
 import StudyRoadmap from "./pages/StudyRoadmap";
 import MockTests from "./pages/MockTests";
+import TakeMockTest from "./pages/TakeMockTest";
 import AiAssistant from "./pages/AiAssistant";
 import Gamification from "./pages/Gamification";
 import ProfileSettings from "./pages/ProfileSettings";
@@ -60,6 +61,7 @@ const App = () => {
               <Route path="/library" element={<DigitalLibrary />} />
               <Route path="/roadmap" element={<StudyRoadmap />} />
               <Route path="/mock-tests" element={<MockTests />} />
+              <Route path="/mock-tests/:testId" element={<TakeMockTest />} />
               <Route path="/assistant" element={<AiAssistant />} />
               <Route path="/gamification" element={<Gamification />} />
               <Route path="/profile" element={<ProfileSettings />} />
