@@ -52,14 +52,23 @@ const TutorCard: React.FC<TutorCardProps> = ({ tutor, onSchedule }) => {
   const { scheduleSession } = useTutorSessions();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const communicationModes = Array.isArray(tutor.communicationModes) 
+    ? tutor.communicationModes 
+    : [];
+
+  const getDefaultMode = () => {
+    if (communicationModes.includes('video')) return 'video';
+    if (communicationModes.includes('voice')) return 'voice';
+    return 'text';
+  };
+
   const form = useForm<ScheduleFormValues>({
     resolver: zodResolver(scheduleFormSchema),
     defaultValues: {
       subject: '',
       topic: '',
       duration: '30min',
-      mode: tutor.communicationModes.includes('video') ? 'video' : 
-             tutor.communicationModes.includes('voice') ? 'voice' : 'text',
+      mode: getDefaultMode(),
     },
   });
 
@@ -106,6 +115,10 @@ const TutorCard: React.FC<TutorCardProps> = ({ tutor, onSchedule }) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const hasMode = (mode: string) => {
+    return Array.isArray(tutor.communicationModes) && tutor.communicationModes.includes(mode);
   };
 
   return (
@@ -182,19 +195,19 @@ const TutorCard: React.FC<TutorCardProps> = ({ tutor, onSchedule }) => {
               
               <div className="flex items-center mb-4 text-sm">
                 <span className="mr-2">Available via:</span>
-                {tutor.communicationModes.includes('text') && (
+                {hasMode('text') && (
                   <Badge variant="outline" className="mr-1">
                     <MessageCircle className="h-3 w-3 mr-1" />
                     Text
                   </Badge>
                 )}
-                {tutor.communicationModes.includes('voice') && (
+                {hasMode('voice') && (
                   <Badge variant="outline" className="mr-1">
                     <Phone className="h-3 w-3 mr-1" />
                     Voice
                   </Badge>
                 )}
-                {tutor.communicationModes.includes('video') && (
+                {hasMode('video') && (
                   <Badge variant="outline">
                     <Video className="h-3 w-3 mr-1" />
                     Video
@@ -337,14 +350,17 @@ const TutorCard: React.FC<TutorCardProps> = ({ tutor, onSchedule }) => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {tutor.communicationModes.includes('text') && (
+                          {hasMode('text') && (
                             <SelectItem value="text">Text</SelectItem>
                           )}
-                          {tutor.communicationModes.includes('voice') && (
+                          {hasMode('voice') && (
                             <SelectItem value="voice">Voice</SelectItem>
                           )}
-                          {tutor.communicationModes.includes('video') && (
+                          {hasMode('video') && (
                             <SelectItem value="video">Video</SelectItem>
+                          )}
+                          {!hasMode('text') && !hasMode('voice') && !hasMode('video') && (
+                            <SelectItem value="text">Text</SelectItem>
                           )}
                         </SelectContent>
                       </Select>

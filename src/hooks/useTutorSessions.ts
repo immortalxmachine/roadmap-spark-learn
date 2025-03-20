@@ -15,19 +15,35 @@ export const useTutorSessions = () => {
     setError(null);
 
     try {
+      // Check if the 'topic' column exists in the tutor_sessions table
+      const { data: tableInfo, error: tableError } = await supabase
+        .from('tutor_sessions')
+        .select('*')
+        .limit(1);
+
+      if (tableError) {
+        throw tableError;
+      }
+
+      // Get the columns available in the table
+      const sampleSession = tableInfo && tableInfo[0];
+      const hasTopicColumn = sampleSession && 'topic' in sampleSession;
+
+      // Adjust query based on available columns
       const { data: userSessions, error: sessionsError } = await supabase
         .from('tutor_sessions')
         .select(`
           id, 
           subject, 
-          topic, 
+          ${hasTopicColumn ? 'topic,' : ''}
           start_time, 
           duration, 
           status, 
           mode, 
           rating, 
           feedback,
-          tutors(name, avatar)
+          tutor_id,
+          tutors(id, name, avatar)
         `)
         .order('start_time', { ascending: false });
 
@@ -41,7 +57,7 @@ export const useTutorSessions = () => {
           tutorName: session.tutors?.name || 'Unknown Tutor',
           tutorAvatar: session.tutors?.avatar || '',
           subject: session.subject,
-          topic: session.topic,
+          topic: session.topic || 'General Session', // Fallback if topic column doesn't exist
           startTime: new Date(session.start_time).toLocaleString(),
           duration: session.duration,
           status: session.status as 'scheduled' | 'in-progress' | 'completed',
@@ -72,17 +88,37 @@ export const useTutorSessions = () => {
 
   const scheduleSession = async (sessionData: SessionRequest) => {
     try {
+      // Check if the table has a topic column before inserting
+      const { data: tableInfo, error: tableError } = await supabase
+        .from('tutor_sessions')
+        .select('*')
+        .limit(1);
+
+      if (tableError) {
+        throw tableError;
+      }
+
+      const sampleSession = tableInfo && tableInfo[0];
+      const hasTopicColumn = sampleSession && 'topic' in sampleSession;
+
+      // Prepare insert data based on available columns
+      const insertData = {
+        tutor_id: sessionData.tutor_id,
+        subject: sessionData.subject,
+        start_time: sessionData.start_time,
+        duration: sessionData.duration,
+        status: 'scheduled',
+        mode: sessionData.mode
+      };
+
+      // Only add topic if the column exists
+      if (hasTopicColumn) {
+        Object.assign(insertData, { topic: sessionData.topic });
+      }
+
       const { error } = await supabase
         .from('tutor_sessions')
-        .insert({
-          tutor_id: sessionData.tutor_id,
-          subject: sessionData.subject,
-          topic: sessionData.topic,
-          start_time: sessionData.start_time,
-          duration: sessionData.duration,
-          status: 'scheduled',
-          mode: sessionData.mode
-        });
+        .insert(insertData);
 
       if (error) {
         throw error;
