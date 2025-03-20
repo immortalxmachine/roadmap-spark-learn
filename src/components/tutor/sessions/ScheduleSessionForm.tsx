@@ -1,230 +1,319 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from '@/components/ui/form';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Phone, Video, MessageCircle } from 'lucide-react';
-import { format } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import { CalendarIcon } from 'lucide-react';
-import { subjects } from '@/data/subjects';
+import { CalendarIcon, Video, MessageSquare, PhoneCall } from 'lucide-react';
+import { format } from 'date-fns';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-interface ScheduleSessionFormProps {
-  onSchedule: (
-    subject: string, 
-    topic: string, 
-    date: Date, 
-    time: string, 
-    duration: string, 
-    sessionType: 'text' | 'voice' | 'video',
-    language: string
-  ) => void;
-}
+const formSchema = z.object({
+  subject: z.string().min(1, { message: "Please select a subject" }),
+  topic: z.string().min(5, { message: "Please describe your topic in at least 5 characters" }),
+  date: z.date(),
+  time: z.string().min(1, { message: "Please select a time" }),
+  duration: z.string().min(1, { message: "Please select a duration" }),
+  mode: z.enum(["text", "voice", "video"]),
+  language: z.string().min(1, { message: "Please select a language" }),
+  notes: z.string().optional(),
+});
 
-const ScheduleSessionForm: React.FC<ScheduleSessionFormProps> = ({ onSchedule }) => {
-  const [selectedSubject, setSelectedSubject] = useState<string>('');
-  const [topic, setTopic] = useState<string>('');
+type FormData = z.infer<typeof formSchema>;
+
+const ScheduleSessionForm = () => {
   const [date, setDate] = useState<Date | undefined>(undefined);
-  const [selectedTime, setSelectedTime] = useState<string>('');
-  const [selectedDuration, setSelectedDuration] = useState<string>('');
-  const [selectedSessionType, setSelectedSessionType] = useState<'text' | 'voice' | 'video'>('video');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('english');
-
-  const today = new Date();
-
-  const languages = [
-    { value: 'english', label: 'English' },
-    { value: 'spanish', label: 'Spanish' },
-    { value: 'french', label: 'French' },
-    { value: 'chinese', label: 'Chinese' },
-    { value: 'german', label: 'German' },
-    { value: 'russian', label: 'Russian' },
-    { value: 'arabic', label: 'Arabic' },
-    { value: 'portuguese', label: 'Portuguese' },
-    { value: 'japanese', label: 'Japanese' },
-  ];
-
-  const handleScheduleSession = () => {
-    if (!selectedSubject || !date || !selectedTime || !selectedDuration || !topic) {
-      return;
-    }
-    
-    onSchedule(
-      selectedSubject,
-      topic,
-      date,
-      selectedTime,
-      selectedDuration,
-      selectedSessionType,
-      selectedLanguage
-    );
-    
-    // Reset form
-    setSelectedSubject('');
-    setDate(undefined);
-    setSelectedTime('');
-    setSelectedDuration('');
-    setTopic('');
-    setSelectedSessionType('video');
-    setSelectedLanguage('english');
+  
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      subject: "",
+      topic: "",
+      time: "",
+      duration: "",
+      mode: "video",
+      language: "English",
+      notes: "",
+    },
+  });
+  
+  const onSubmit = (data: FormData) => {
+    console.log("Form data:", data);
+    // Would connect to backend in a real implementation
   };
 
   return (
-    <Card id="schedule-session">
-      <CardHeader>
-        <CardTitle>Schedule New Session</CardTitle>
-        <CardDescription>
-          Book a one-on-one tutoring session
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Subject</Label>
-            <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a subject" />
-              </SelectTrigger>
-              <SelectContent>
-                {subjects.map((subject) => (
-                  <SelectItem key={subject.value} value={subject.value}>
-                    {subject.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Topic</Label>
-            <Input 
-              placeholder="What do you need help with?"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Language</Label>
-            <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                {languages.map((language) => (
-                  <SelectItem key={language.value} value={language.value}>
-                    {language.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  disabled={(date) => date < today}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <FormField
+          control={form.control}
+          name="subject"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Subject</FormLabel>
+              <Select 
+                onValueChange={field.onChange} 
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a subject" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="mathematics">Mathematics</SelectItem>
+                  <SelectItem value="physics">Physics</SelectItem>
+                  <SelectItem value="chemistry">Chemistry</SelectItem>
+                  <SelectItem value="biology">Biology</SelectItem>
+                  <SelectItem value="computer-science">Computer Science</SelectItem>
+                  <SelectItem value="history">History</SelectItem>
+                  <SelectItem value="literature">Literature</SelectItem>
+                  <SelectItem value="language">Language</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="topic"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Topic</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="What specific topic do you need help with?" 
+                  {...field} 
                 />
-              </PopoverContent>
-            </Popover>
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Time</Label>
-            <Select value={selectedTime} onValueChange={setSelectedTime}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a time" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="09:00 AM">09:00 AM</SelectItem>
-                <SelectItem value="10:00 AM">10:00 AM</SelectItem>
-                <SelectItem value="11:00 AM">11:00 AM</SelectItem>
-                <SelectItem value="12:00 PM">12:00 PM</SelectItem>
-                <SelectItem value="01:00 PM">01:00 PM</SelectItem>
-                <SelectItem value="02:00 PM">02:00 PM</SelectItem>
-                <SelectItem value="03:00 PM">03:00 PM</SelectItem>
-                <SelectItem value="04:00 PM">04:00 PM</SelectItem>
-                <SelectItem value="05:00 PM">05:00 PM</SelectItem>
-                <SelectItem value="06:00 PM">06:00 PM</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Session Duration</Label>
-            <Select value={selectedDuration} onValueChange={setSelectedDuration}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select duration" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="30">30 minutes</SelectItem>
-                <SelectItem value="45">45 minutes</SelectItem>
-                <SelectItem value="60">60 minutes</SelectItem>
-                <SelectItem value="90">90 minutes</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Session Type</Label>
-            <div className="grid grid-cols-3 gap-2">
-              <Button 
-                variant={selectedSessionType === 'text' ? 'default' : 'outline'} 
-                className="flex flex-col items-center justify-center h-20"
-                onClick={() => setSelectedSessionType('text')}
-              >
-                <MessageCircle className="mb-1 h-5 w-5" />
-                <span className="text-xs">Text</span>
-              </Button>
-              <Button 
-                variant={selectedSessionType === 'voice' ? 'default' : 'outline'} 
-                className="flex flex-col items-center justify-center h-20"
-                onClick={() => setSelectedSessionType('voice')}
-              >
-                <Phone className="mb-1 h-5 w-5" />
-                <span className="text-xs">Voice</span>
-              </Button>
-              <Button 
-                variant={selectedSessionType === 'video' ? 'default' : 'outline'} 
-                className="flex flex-col items-center justify-center h-20"
-                onClick={() => setSelectedSessionType('video')}
-              >
-                <Video className="mb-1 h-5 w-5" />
-                <span className="text-xs">Video</span>
-              </Button>
-            </div>
-          </div>
-          
-          <Button className="w-full" onClick={handleScheduleSession}>
-            <Calendar className="mr-2 h-4 w-4" />
-            Schedule Session
-          </Button>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        setDate(date);
+                      }}
+                      disabled={(date) => {
+                        // Disable dates in the past
+                        return date < new Date(new Date().setHours(0, 0, 0, 0));
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Time</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a time" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="9:00">9:00 AM</SelectItem>
+                    <SelectItem value="10:00">10:00 AM</SelectItem>
+                    <SelectItem value="11:00">11:00 AM</SelectItem>
+                    <SelectItem value="12:00">12:00 PM</SelectItem>
+                    <SelectItem value="13:00">1:00 PM</SelectItem>
+                    <SelectItem value="14:00">2:00 PM</SelectItem>
+                    <SelectItem value="15:00">3:00 PM</SelectItem>
+                    <SelectItem value="16:00">4:00 PM</SelectItem>
+                    <SelectItem value="17:00">5:00 PM</SelectItem>
+                    <SelectItem value="18:00">6:00 PM</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="duration"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Duration</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="15">15 minutes</SelectItem>
+                    <SelectItem value="30">30 minutes</SelectItem>
+                    <SelectItem value="45">45 minutes</SelectItem>
+                    <SelectItem value="60">1 hour</SelectItem>
+                    <SelectItem value="90">1.5 hours</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="language"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Language</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="English">English</SelectItem>
+                    <SelectItem value="Spanish">Spanish</SelectItem>
+                    <SelectItem value="French">French</SelectItem>
+                    <SelectItem value="German">German</SelectItem>
+                    <SelectItem value="Chinese">Chinese</SelectItem>
+                    <SelectItem value="Russian">Russian</SelectItem>
+                    <SelectItem value="Arabic">Arabic</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="mode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Communication Mode</FormLabel>
+              <div className="flex space-x-3">
+                <Button
+                  type="button"
+                  variant={field.value === "text" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => field.onChange("text")}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Text
+                </Button>
+                <Button
+                  type="button"
+                  variant={field.value === "voice" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => field.onChange("voice")}
+                >
+                  <PhoneCall className="h-4 w-4 mr-2" />
+                  Voice
+                </Button>
+                <Button
+                  type="button"
+                  variant={field.value === "video" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => field.onChange("video")}
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Video
+                </Button>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Additional Notes</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Anything else the tutor should know? Specific questions or concepts you're struggling with?"
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="w-full">Schedule Session</Button>
+      </form>
+    </Form>
   );
 };
 

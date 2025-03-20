@@ -11,9 +11,11 @@ import { Tutor } from '@/types/tutor';
 import { Session } from '@/types/session';
 import { Badge } from '@/components/ui/badge';
 import { Star, ArrowUp, Globe } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const TutorConnection = () => {
   const [activeTab, setActiveTab] = useState('find-tutor');
+  const { toast } = useToast();
   
   // Mock data for tutors
   const tutors: Tutor[] = [
@@ -104,12 +106,71 @@ const TutorConnection = () => {
       language: 'English'
     }
   ];
+  
+  // Mock data for past sessions (adding this in case the error is related to missing pastSessions)
+  const pastSessions: Session[] = [
+    {
+      id: 101,
+      tutorName: "Dr. Emily Peterson",
+      tutorAvatar: "EP",
+      subject: "Biology",
+      topic: "Introduction to Cell Biology",
+      startTime: "Yesterday, 10:00 AM",
+      duration: "60 minutes",
+      status: 'completed',
+      mode: 'video',
+      language: 'English',
+      rating: 5,
+      feedback: "Excellent session, very helpful!"
+    }
+  ];
 
   // Handler for scheduling a session from the FindTutorTab
   const handleScheduleWithTutor = (tutor: Tutor) => {
     // This function would be implemented to switch to the sessions tab
     // and pre-populate the scheduling form with the selected tutor
     setActiveTab('sessions');
+    toast({
+      title: "Tutor Selected",
+      description: `You've selected ${tutor.name} for scheduling a session.`,
+    });
+  };
+  
+  // Handler for joining a session
+  const handleJoinSession = (sessionId: number) => {
+    toast({
+      title: "Joining Session",
+      description: "Connecting to your tutor session...",
+    });
+    console.log("Joining session:", sessionId);
+  };
+  
+  // Handler for canceling a session
+  const handleCancelSession = (sessionId: number) => {
+    toast({
+      title: "Session Canceled",
+      description: "Your session has been canceled.",
+      variant: "destructive"
+    });
+    console.log("Canceling session:", sessionId);
+  };
+  
+  // Handler for adding a session to calendar
+  const handleAddToCalendar = (session: Session) => {
+    toast({
+      title: "Added to Calendar",
+      description: `Session on ${session.topic} added to your calendar.`,
+    });
+    console.log("Adding to calendar:", session);
+  };
+  
+  // Handler for submitting a review
+  const handleReviewSubmit = (sessionId: number, rating: number, feedback: string) => {
+    toast({
+      title: "Review Submitted",
+      description: "Thank you for your feedback!",
+    });
+    console.log("Review submitted:", { sessionId, rating, feedback });
   };
 
   return (
@@ -177,7 +238,14 @@ const TutorConnection = () => {
 
           {/* My Sessions Tab */}
           <TabsContent value="sessions">
-            <SessionsTab activeSessions={activeSessions} />
+            <SessionsTab 
+              activeSessions={activeSessions} 
+              pastSessions={pastSessions}
+              onJoinSession={handleJoinSession}
+              onCancelSession={handleCancelSession}
+              onAddToCalendar={handleAddToCalendar}
+              onReviewSubmit={handleReviewSubmit}
+            />
           </TabsContent>
 
           {/* Tutor Leaderboard Tab */}
