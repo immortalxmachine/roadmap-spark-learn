@@ -20,13 +20,12 @@ export const useTutorSessions = () => {
         .select(`
           id, 
           subject, 
-          topic, 
+          mode, 
           start_time, 
           duration, 
           status, 
-          mode, 
-          rating, 
           feedback,
+          rating,
           tutors(name, avatar)
         `)
         .order('start_time', { ascending: false });
@@ -36,12 +35,13 @@ export const useTutorSessions = () => {
       }
 
       if (userSessions) {
+        // Add a placeholder topic since it's not in the database but required by the interface
         const transformedSessions = userSessions.map((session): Session => ({
           id: session.id,
           tutorName: session.tutors?.name || 'Unknown Tutor',
           tutorAvatar: session.tutors?.avatar || '',
           subject: session.subject,
-          topic: session.topic,
+          topic: 'General Discussion', // Using a default value since topic doesn't exist in DB
           startTime: new Date(session.start_time).toLocaleString(),
           duration: session.duration,
           status: session.status as 'scheduled' | 'in-progress' | 'completed',
@@ -77,11 +77,10 @@ export const useTutorSessions = () => {
         .insert({
           tutor_id: sessionData.tutor_id,
           subject: sessionData.subject,
-          topic: sessionData.topic,
+          mode: sessionData.mode,
           start_time: sessionData.start_time,
           duration: sessionData.duration,
-          status: 'scheduled',
-          mode: sessionData.mode
+          status: 'scheduled'
         });
 
       if (error) {

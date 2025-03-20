@@ -4,7 +4,7 @@ export interface Session {
   tutorName: string;
   tutorAvatar: string;
   subject: string;
-  topic: string;
+  topic: string; // Even though it's not in DB, keep in interface for UI
   startTime: string;
   duration: string;
   status: 'scheduled' | 'in-progress' | 'completed';
@@ -16,7 +16,7 @@ export interface Session {
 export interface SessionRequest {
   tutor_id: string;
   subject: string;
-  topic: string;
+  topic?: string; // Made optional since it doesn't exist in DB
   start_time: string;
   duration: string;
   mode: 'text' | 'voice' | 'video';
