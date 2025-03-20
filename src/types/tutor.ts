@@ -1,22 +1,16 @@
 
 export interface Tutor {
-  id: string;
+  id: number;
   name: string;
   specialty: string;
   expertise: string[];
   rating: number;
   reviews: number;
   status: 'available' | 'busy' | 'scheduled';
+  availableIn?: string;
+  nextSession?: string;
   avatar: string;
   level: number;
   badges: string[];
-  communicationModes: string[];
-  available_in?: string;
-  next_session?: string;
-}
-
-export interface TutorFilters {
-  subject?: string;
-  availability?: string;
-  communicationMode?: string;
+  communicationModes: ('text' | 'voice' | 'video')[];
 }
