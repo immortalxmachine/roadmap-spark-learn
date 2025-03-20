@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -27,10 +27,6 @@ const SessionsTab = () => {
   const pastSessions = sessions.filter(s => s.status === 'completed');
 
   const handleStartSession = async (session: Session) => {
-    // Redirect to Google Meet
-    window.open("https://meet.google.com/kho-pjuf-hpt", "_blank");
-    
-    // Update session status
     await updateSessionStatus(session.id, 'in-progress');
     setActiveTab('active');
   };

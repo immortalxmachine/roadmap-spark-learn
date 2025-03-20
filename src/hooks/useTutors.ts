@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tutor, TutorFilters } from '@/types/tutor';
 import { useToast } from '@/hooks/use-toast';
-import { Json } from '@/integrations/supabase/types';
 
 export const useTutors = (filters?: TutorFilters) => {
   const [tutors, setTutors] = useState<Tutor[]>([]);
@@ -24,13 +23,11 @@ export const useTutors = (filters?: TutorFilters) => {
           query = query.eq('specialty', filters.subject);
         }
 
-        // We're using active_session instead of "status" in our database
         if (filters?.availability) {
-          query = query.eq('active_session', filters.availability === 'busy');
+          query = query.eq('status', filters.availability);
         }
 
         if (filters?.communicationMode) {
-          // Using contains with a string value since our DB uses JSONB arrays
           query = query.contains('communication_modes', [filters.communicationMode]);
         }
 
@@ -41,36 +38,21 @@ export const useTutors = (filters?: TutorFilters) => {
         }
 
         // Transform the data to match our Tutor interface
-        const transformedData = data.map((tutor): Tutor => {
-          // Safely convert values to match the Tutor interface
-          const communicationModesArray = Array.isArray(tutor.communication_modes) 
-            ? tutor.communication_modes 
-            : (tutor.communication_modes ? [tutor.communication_modes.toString()] : []);
-            
-          const badgesArray = Array.isArray(tutor.badges) 
-            ? tutor.badges 
-            : (tutor.badges ? [tutor.badges.toString()] : []);
-
-          const expertiseArray = tutor.expertise 
-            ? (Array.isArray(tutor.expertise) ? tutor.expertise : [tutor.expertise.toString()]) 
-            : [];
-
-          return {
-            id: tutor.id,
-            name: tutor.name,
-            specialty: tutor.specialty || '',
-            expertise: expertiseArray,
-            rating: tutor.rating || 0,
-            reviews: 0, // Default value since it's not in DB
-            status: tutor.active_session ? 'busy' : 'available', // Convert boolean to status
-            avatar: tutor.avatar || '',
-            level: 1, // Default value since it's not in DB
-            badges: badgesArray,
-            communicationModes: communicationModesArray,
-            available_in: 'Now', // Default value since it's not in DB
-            next_session: 'N/A' // Default value since it's not in DB
-          };
-        });
+        const transformedData = data.map((tutor): Tutor => ({
+          id: tutor.id,
+          name: tutor.name,
+          specialty: tutor.specialty,
+          expertise: tutor.expertise,
+          rating: tutor.rating,
+          reviews: tutor.reviews,
+          status: tutor.status as 'available' | 'busy' | 'scheduled',
+          avatar: tutor.avatar,
+          level: tutor.level,
+          badges: tutor.badges || [],
+          communicationModes: tutor.communication_modes,
+          available_in: tutor.available_in,
+          next_session: tutor.next_session
+        }));
 
         setTutors(transformedData);
       } catch (err: any) {

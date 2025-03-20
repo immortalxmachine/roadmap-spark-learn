@@ -12,312 +12,319 @@ export type Database = {
       gamification: {
         Row: {
           badges: Json | null
-          created_at: string | null
+          created_at: string
           id: string
           last_activity: string | null
           level: number | null
           longest_streak: number | null
           points: number | null
           streaks: number | null
-          updated_at: string | null
+          updated_at: string
           user_id: string | null
         }
         Insert: {
           badges?: Json | null
-          created_at?: string | null
-          id: string
-          last_activity?: string | null
-          level?: number | null
-          longest_streak?: number | null
-          points?: number | null
-          streaks?: number | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          badges?: Json | null
-          created_at?: string | null
+          created_at?: string
           id?: string
           last_activity?: string | null
           level?: number | null
           longest_streak?: number | null
           points?: number | null
           streaks?: number | null
-          updated_at?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          badges?: Json | null
+          created_at?: string
+          id?: string
+          last_activity?: string | null
+          level?: number | null
+          longest_streak?: number | null
+          points?: number | null
+          streaks?: number | null
+          updated_at?: string
           user_id?: string | null
         }
         Relationships: []
       }
       mock_tests: {
         Row: {
-          created_at: string | null
-          description: string | null
-          difficulty: string | null
+          created_at: string
+          description: string
+          difficulty: string
           id: string
-          question_count: number | null
-          subject: string | null
-          time_limit_minutes: number | null
+          question_count: number
+          subject: string
+          time_limit_minutes: number
           title: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
-          description?: string | null
-          difficulty?: string | null
-          id: string
-          question_count?: number | null
-          subject?: string | null
-          time_limit_minutes?: number | null
+          created_at?: string
+          description: string
+          difficulty: string
+          id?: string
+          question_count: number
+          subject: string
+          time_limit_minutes: number
           title: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
-          description?: string | null
-          difficulty?: string | null
+          created_at?: string
+          description?: string
+          difficulty?: string
           id?: string
-          question_count?: number | null
-          subject?: string | null
-          time_limit_minutes?: number | null
+          question_count?: number
+          subject?: string
+          time_limit_minutes?: number
           title?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
           avatar_url: string | null
-          created_at: string | null
+          created_at: string
           id: string
-          username: string
+          updated_at: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
-          created_at?: string | null
+          created_at?: string
           id: string
-          username: string
+          updated_at?: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
-          created_at?: string | null
+          created_at?: string
           id?: string
-          username?: string
-        }
-        Relationships: []
-      }
-      sessions: {
-        Row: {
-          communication_mode: string | null
-          created_at: string | null
-          date: string | null
-          feedback: string | null
-          id: string
-          notes: string | null
-          student_name: string | null
-          subject: string | null
-          topic: string | null
-          tutor_id: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          communication_mode?: string | null
-          created_at?: string | null
-          date?: string | null
-          feedback?: string | null
-          id: string
-          notes?: string | null
-          student_name?: string | null
-          subject?: string | null
-          topic?: string | null
-          tutor_id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          communication_mode?: string | null
-          created_at?: string | null
-          date?: string | null
-          feedback?: string | null
-          id?: string
-          notes?: string | null
-          student_name?: string | null
-          subject?: string | null
-          topic?: string | null
-          tutor_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
       study_materials: {
         Row: {
-          description: string | null
-          difficulty: string | null
+          created_at: string
+          description: string
+          difficulty: string
           id: string
+          subject: string
           thumbnail_url: string | null
           title: string
-          type: string | null
-          updated_at: string | null
+          type: string
+          updated_at: string
+          url: string | null
         }
         Insert: {
-          description?: string | null
-          difficulty?: string | null
-          id: string
+          created_at?: string
+          description: string
+          difficulty: string
+          id?: string
+          subject: string
           thumbnail_url?: string | null
           title: string
-          type?: string | null
-          updated_at?: string | null
+          type: string
+          updated_at?: string
+          url?: string | null
         }
         Update: {
-          description?: string | null
-          difficulty?: string | null
+          created_at?: string
+          description?: string
+          difficulty?: string
           id?: string
+          subject?: string
           thumbnail_url?: string | null
           title?: string
-          type?: string | null
-          updated_at?: string | null
+          type?: string
+          updated_at?: string
+          url?: string | null
         }
         Relationships: []
       }
       study_roadmaps: {
         Row: {
-          description: string | null
-          difficulty: string | null
-          estimated_duration: string | null
+          created_at: string
+          description: string
+          difficulty: string
+          estimated_duration: string
           id: string
-          steps: Json | null
-          topic: string | null
-          updated_at: string | null
+          steps: Json
+          subject: string
+          title: string
+          updated_at: string
         }
         Insert: {
-          description?: string | null
-          difficulty?: string | null
-          estimated_duration?: string | null
-          id: string
-          steps?: Json | null
-          topic?: string | null
-          updated_at?: string | null
+          created_at?: string
+          description: string
+          difficulty: string
+          estimated_duration: string
+          id?: string
+          steps: Json
+          subject: string
+          title: string
+          updated_at?: string
         }
         Update: {
-          description?: string | null
-          difficulty?: string | null
-          estimated_duration?: string | null
+          created_at?: string
+          description?: string
+          difficulty?: string
+          estimated_duration?: string
           id?: string
-          steps?: Json | null
-          topic?: string | null
-          updated_at?: string | null
+          steps?: Json
+          subject?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
       test_questions: {
         Row: {
-          correct_answer: string
-          created_at: string | null
-          explanation: string | null
+          correct_answer: number
+          created_at: string
+          explanation: string
           id: string
+          options: Json
           question: string
-          subject: string | null
+          subject: string
           test_id: string | null
-          updated_at: string | null
+          topic: string
+          updated_at: string
         }
         Insert: {
-          correct_answer: string
-          created_at?: string | null
-          explanation?: string | null
-          id: string
+          correct_answer: number
+          created_at?: string
+          explanation: string
+          id?: string
+          options: Json
           question: string
-          subject?: string | null
+          subject: string
           test_id?: string | null
-          updated_at?: string | null
+          topic: string
+          updated_at?: string
         }
         Update: {
-          correct_answer?: string
-          created_at?: string | null
-          explanation?: string | null
+          correct_answer?: number
+          created_at?: string
+          explanation?: string
           id?: string
+          options?: Json
           question?: string
-          subject?: string | null
+          subject?: string
           test_id?: string | null
-          updated_at?: string | null
+          topic?: string
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "test_questions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "mock_tests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       test_results: {
         Row: {
-          correct_answers: number | null
-          date: string | null
+          correct_answers: number[]
+          date: string
           id: string
-          incorrect_answers: number | null
-          score: number | null
-          strengths: string | null
+          incorrect_answers: number[]
+          score: number
+          strengths: string[] | null
           test_id: string | null
-          time_taken_seconds: number | null
-          total_questions: number | null
+          time_taken_seconds: number
+          total_questions: number
           user_id: string | null
-          weaknesses: string | null
+          weaknesses: string[] | null
         }
         Insert: {
-          correct_answers?: number | null
-          date?: string | null
-          id: string
-          incorrect_answers?: number | null
-          score?: number | null
-          strengths?: string | null
+          correct_answers: number[]
+          date?: string
+          id?: string
+          incorrect_answers: number[]
+          score: number
+          strengths?: string[] | null
           test_id?: string | null
-          time_taken_seconds?: number | null
-          total_questions?: number | null
+          time_taken_seconds: number
+          total_questions: number
           user_id?: string | null
-          weaknesses?: string | null
+          weaknesses?: string[] | null
         }
         Update: {
-          correct_answers?: number | null
-          date?: string | null
+          correct_answers?: number[]
+          date?: string
           id?: string
-          incorrect_answers?: number | null
-          score?: number | null
-          strengths?: string | null
+          incorrect_answers?: number[]
+          score?: number
+          strengths?: string[] | null
           test_id?: string | null
-          time_taken_seconds?: number | null
-          total_questions?: number | null
+          time_taken_seconds?: number
+          total_questions?: number
           user_id?: string | null
-          weaknesses?: string | null
+          weaknesses?: string[] | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "test_results_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "mock_tests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tutor_sessions: {
         Row: {
-          created_at: string | null
+          created_at: string
           duration: string
           feedback: string | null
           id: string
           mode: string
+          rating: number | null
           start_time: string
           status: string
           subject: string
-          tutor_id: string
-          updated_at: string | null
+          topic: string
+          tutor_id: string | null
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           duration: string
           feedback?: string | null
-          id: string
+          id?: string
           mode: string
+          rating?: number | null
           start_time: string
           status: string
           subject: string
-          tutor_id: string
-          updated_at?: string | null
+          topic: string
+          tutor_id?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           duration?: string
           feedback?: string | null
           id?: string
           mode?: string
+          rating?: number | null
           start_time?: string
           status?: string
           subject?: string
-          tutor_id?: string
-          updated_at?: string | null
+          topic?: string
+          tutor_id?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -331,113 +338,125 @@ export type Database = {
       }
       tutors: {
         Row: {
-          active_session: boolean | null
-          avatar: string | null
-          badges: Json | null
-          communication_modes: Json | null
-          created_at: string | null
-          expertise: string | null
+          available_in: string | null
+          avatar: string
+          badges: string[] | null
+          communication_modes: string[]
+          created_at: string
+          expertise: string[]
           id: string
+          level: number | null
           name: string
+          next_session: string | null
           rating: number | null
-          specialty: string | null
-          updated_at: string | null
+          reviews: number | null
+          specialty: string
+          status: string
+          updated_at: string
         }
         Insert: {
-          active_session?: boolean | null
-          avatar?: string | null
-          badges?: Json | null
-          communication_modes?: Json | null
-          created_at?: string | null
-          expertise?: string | null
-          id: string
+          available_in?: string | null
+          avatar: string
+          badges?: string[] | null
+          communication_modes: string[]
+          created_at?: string
+          expertise: string[]
+          id?: string
+          level?: number | null
           name: string
+          next_session?: string | null
           rating?: number | null
-          specialty?: string | null
-          updated_at?: string | null
+          reviews?: number | null
+          specialty: string
+          status: string
+          updated_at?: string
         }
         Update: {
-          active_session?: boolean | null
-          avatar?: string | null
-          badges?: Json | null
-          communication_modes?: Json | null
-          created_at?: string | null
-          expertise?: string | null
+          available_in?: string | null
+          avatar?: string
+          badges?: string[] | null
+          communication_modes?: string[]
+          created_at?: string
+          expertise?: string[]
           id?: string
+          level?: number | null
           name?: string
+          next_session?: string | null
           rating?: number | null
-          specialty?: string | null
-          updated_at?: string | null
+          reviews?: number | null
+          specialty?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
       user_roadmap_progress: {
         Row: {
-          completed_steps: Json | null
-          created_at: string | null
+          completed_steps: number[] | null
           current_step: number | null
           id: string
-          last_updated_at: string | null
+          last_updated_at: string
           roadmap_id: string | null
+          started_at: string
           user_id: string | null
         }
         Insert: {
-          completed_steps?: Json | null
-          created_at?: string | null
+          completed_steps?: number[] | null
           current_step?: number | null
-          id: string
-          last_updated_at?: string | null
+          id?: string
+          last_updated_at?: string
           roadmap_id?: string | null
+          started_at?: string
           user_id?: string | null
         }
         Update: {
-          completed_steps?: Json | null
-          created_at?: string | null
+          completed_steps?: number[] | null
           current_step?: number | null
           id?: string
-          last_updated_at?: string | null
+          last_updated_at?: string
           roadmap_id?: string | null
+          started_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roadmap_progress_roadmap_id_fkey"
+            columns: ["roadmap_id"]
+            isOneToOne: false
+            referencedRelation: "study_roadmaps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_settings: {
         Row: {
-          created_at: string | null
+          created_at: string
           font_size: string | null
           high_contrast: boolean | null
           id: string
           notification_preferences: Json | null
           text_to_speech: boolean | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           font_size?: string | null
           high_contrast?: boolean | null
           id: string
           notification_preferences?: Json | null
           text_to_speech?: boolean | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           font_size?: string | null
           high_contrast?: boolean | null
           id?: string
           notification_preferences?: Json | null
           text_to_speech?: boolean | null
-          updated_at?: string | null
+          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_settings_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
