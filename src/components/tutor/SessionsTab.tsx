@@ -15,7 +15,8 @@ import {
   Send, 
   Star, 
   History,
-  FileText
+  FileText,
+  Globe
 } from 'lucide-react';
 import AnimatedAvatar from '@/components/ui/avatar-animated';
 import { useToast } from "@/hooks/use-toast";
@@ -49,7 +50,6 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
     feedback: '',
   });
   const [sessionBeingReviewed, setSessionBeingReviewed] = useState<number | null>(null);
-
   const [pastSessions, setPastSessions] = useState<Session[]>([
     {
       id: 101,
@@ -77,6 +77,19 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
       rating: 4
     }
   ]);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('english');
+
+  const languages = [
+    { value: 'english', label: 'English' },
+    { value: 'spanish', label: 'Spanish' },
+    { value: 'french', label: 'French' },
+    { value: 'chinese', label: 'Chinese' },
+    { value: 'german', label: 'German' },
+    { value: 'russian', label: 'Russian' },
+    { value: 'arabic', label: 'Arabic' },
+    { value: 'portuguese', label: 'Portuguese' },
+    { value: 'japanese', label: 'Japanese' },
+  ];
 
   const handleSendMessage = () => {
     if (message.trim() === '') return;
@@ -117,14 +130,15 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
       startTime: `${format(date, 'PPP')}, ${selectedTime}`,
       duration: `${selectedDuration} minutes`,
       status: 'scheduled',
-      mode: selectedSessionType
+      mode: selectedSessionType,
+      language: selectedLanguage
     };
     
     setActiveSessions([...activeSessions, newSession]);
     
     toast({
       title: "Session scheduled!",
-      description: `Your ${selectedDuration} minute ${selectedSessionType} session has been scheduled for ${format(date, 'PPP')} at ${selectedTime}.`,
+      description: `Your ${selectedDuration} minute ${selectedSessionType} session in ${selectedLanguage} has been scheduled for ${format(date, 'PPP')} at ${selectedTime}.`,
     });
     
     setSelectedSubject('');
@@ -133,6 +147,7 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
     setSelectedDuration('');
     setTopic('');
     setSelectedSessionType('video');
+    setSelectedLanguage('english');
   };
 
   const handleCancelSession = (sessionId: number) => {
@@ -277,6 +292,12 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
                                 )}
                                 {session.mode.charAt(0).toUpperCase() + session.mode.slice(1)} Session
                               </div>
+                              {session.language && (
+                                <div className="flex items-center">
+                                  <Globe className="h-4 w-4 mr-1 text-muted-foreground" />
+                                  {session.language}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -382,6 +403,7 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
                           <TableHead>Tutor</TableHead>
                           <TableHead>Date & Time</TableHead>
                           <TableHead>Duration</TableHead>
+                          <TableHead>Language</TableHead>
                           <TableHead>Rating</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
@@ -412,6 +434,7 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
                             </TableCell>
                             <TableCell>{session.startTime}</TableCell>
                             <TableCell>{session.duration}</TableCell>
+                            <TableCell>{session.language || 'English'}</TableCell>
                             <TableCell>
                               {renderStarRating(session.rating)}
                             </TableCell>
@@ -541,6 +564,22 @@ const SessionsTab: React.FC<SessionsTabProps> = ({ activeSessions: initialSessio
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                 />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Language</Label>
+                <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {languages.map((language) => (
+                      <SelectItem key={language.value} value={language.value}>
+                        {language.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-2">

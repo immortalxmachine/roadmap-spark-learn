@@ -10,7 +10,7 @@ import TutorLeaderboard from '@/components/tutor/TutorLeaderboard';
 import { Tutor } from '@/types/tutor';
 import { Session } from '@/types/session';
 import { Badge } from '@/components/ui/badge';
-import { Star, ArrowUp } from 'lucide-react';
+import { Star, ArrowUp, Globe } from 'lucide-react';
 
 const TutorConnection = () => {
   const [activeTab, setActiveTab] = useState('find-tutor');
@@ -28,7 +28,8 @@ const TutorConnection = () => {
       avatar: "SJ",
       level: 24,
       badges: ["Top Physics Tutor", "Session Expert"],
-      communicationModes: ["text", "voice", "video"]
+      communicationModes: ["text", "voice", "video"],
+      languages: ["English", "Spanish"]
     },
     {
       id: 2,
@@ -42,7 +43,8 @@ const TutorConnection = () => {
       avatar: "MC",
       level: 18,
       badges: ["Chemistry Wizard"],
-      communicationModes: ["text", "voice"]
+      communicationModes: ["text", "voice"],
+      languages: ["English", "Chinese", "French"]
     },
     {
       id: 3,
@@ -55,7 +57,8 @@ const TutorConnection = () => {
       avatar: "EP",
       level: 21,
       badges: ["Biology Master", "Patient Teacher"],
-      communicationModes: ["text", "voice", "video"]
+      communicationModes: ["text", "voice", "video"],
+      languages: ["English", "German"]
     },
     {
       id: 4,
@@ -69,7 +72,8 @@ const TutorConnection = () => {
       avatar: "DW",
       level: 32,
       badges: ["Math Genius", "Top Rated"],
-      communicationModes: ["text", "video"]
+      communicationModes: ["text", "video"],
+      languages: ["English", "Russian"]
     }
   ];
   
@@ -84,7 +88,8 @@ const TutorConnection = () => {
       startTime: "Today, 2:00 PM",
       duration: "45 minutes",
       status: 'in-progress',
-      mode: 'video'
+      mode: 'video',
+      language: 'English'
     },
     {
       id: 2,
@@ -95,7 +100,8 @@ const TutorConnection = () => {
       startTime: "Tomorrow, 4:00 PM",
       duration: "60 minutes",
       status: 'scheduled',
-      mode: 'voice'
+      mode: 'voice',
+      language: 'English'
     }
   ];
 
@@ -120,12 +126,16 @@ const TutorConnection = () => {
               <ArrowUp className="h-3 w-3 mr-1" />
               Main Focus
             </Badge>
+            <Badge className="bg-blue-500 hover:bg-blue-600">
+              <Globe className="h-3 w-3 mr-1" />
+              Multiple Languages
+            </Badge>
           </div>
           <p className="text-muted-foreground mb-1">Connect with volunteer tutors to get the help you need — our top priority service</p>
           <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-md mb-4 flex items-center">
             <Star className="h-5 w-5 text-amber-500 mr-2" />
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              This is a priority feature. Tutors are standing by to help with your questions.
+              This is a priority feature. Tutors are standing by to help with your questions in multiple languages.
             </p>
           </div>
           <TextToSpeech text="Volunteer Tutor Connection. Connect with volunteer tutors to get help with your studies. This is a high priority service." />

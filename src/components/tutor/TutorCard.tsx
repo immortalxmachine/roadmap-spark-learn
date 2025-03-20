@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Phone, Video, Calendar, Star, GraduationCap, Award } from 'lucide-react';
+import { MessageCircle, Phone, Video, Calendar, Star, GraduationCap, Award, Globe } from 'lucide-react';
 import AnimatedAvatar from '@/components/ui/avatar-animated';
 import { useToast } from "@/hooks/use-toast";
 import { Tutor } from '@/types/tutor';
@@ -104,6 +104,21 @@ const TutorCard: React.FC<TutorCardProps> = ({ tutor, onSchedule }) => {
                 </div>
               ))}
             </div>
+            
+            {/* Languages spoken */}
+            {tutor.languages && tutor.languages.length > 0 && (
+              <div className="flex items-center mb-3 text-sm">
+                <Globe className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="mr-2">Languages:</span>
+                <div className="flex flex-wrap gap-1">
+                  {tutor.languages.map((language, index) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {language}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className="flex items-center mb-4 text-sm">
               <span className="mr-2">Available via:</span>

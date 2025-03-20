@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { MessageCircle, Phone, Video, Calendar, Search, Filter, Upload } from 'lucide-react';
+import { MessageCircle, Phone, Video, Calendar, Search, Filter, Upload, Globe } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { subjects } from '@/data/subjects';
 import TutorCard from './TutorCard';
@@ -19,8 +19,22 @@ interface FindTutorTabProps {
   onScheduleWithTutor?: (tutor: Tutor) => void;
 }
 
+// Available languages list
+const languages = [
+  { value: 'english', label: 'English' },
+  { value: 'spanish', label: 'Spanish' },
+  { value: 'french', label: 'French' },
+  { value: 'chinese', label: 'Chinese' },
+  { value: 'german', label: 'German' },
+  { value: 'russian', label: 'Russian' },
+  { value: 'arabic', label: 'Arabic' },
+  { value: 'portuguese', label: 'Portuguese' },
+  { value: 'japanese', label: 'Japanese' },
+];
+
 const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor }) => {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [urgencyLevel, setUrgencyLevel] = useState<string>("");
   const [question, setQuestion] = useState<string>("");
@@ -83,11 +97,16 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
   };
 
   const findMatchingTutors = () => {
-    // Match tutors by subject and communication preferences
+    // Match tutors by subject, language, and communication preferences
     return tutors.filter(tutor => {
       // Match by subject
       const subjectMatch = tutor.specialty.toLowerCase() === selectedSubject.toLowerCase() ||
         tutor.expertise.some(exp => exp.toLowerCase().includes(selectedSubject.toLowerCase()));
+      
+      // Match by language if selected
+      const languageMatch = !selectedLanguage || 
+        (tutor.languages && tutor.languages.some(lang => 
+          lang.toLowerCase() === selectedLanguage.toLowerCase()));
       
       // Match by communication preference if any selected
       const commMatch = !Object.values(commPreferences).some(Boolean) || 
@@ -98,7 +117,7 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
       // Prioritize available tutors if urgency is high
       const urgencyMatch = urgencyLevel !== 'high' || tutor.status === 'available';
       
-      return subjectMatch && commMatch && urgencyMatch;
+      return subjectMatch && languageMatch && commMatch && urgencyMatch;
     });
   };
 
@@ -116,6 +135,23 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
         tutor.expertise.some(exp => exp.toLowerCase().includes(subject.toLowerCase()))
       );
       setFilteredTutors(filtered);
+      setIsSearching(false);
+    }, 500);
+  };
+
+  const handleLanguageFilterChange = (language: string) => {
+    setIsSearching(true);
+    
+    setTimeout(() => {
+      if (language === "all") {
+        setFilteredTutors(tutors);
+      } else {
+        const filtered = tutors.filter(tutor => 
+          tutor.languages && tutor.languages.some(lang => 
+            lang.toLowerCase() === language.toLowerCase())
+        );
+        setFilteredTutors(filtered);
+      }
       setIsSearching(false);
     }, 500);
   };
@@ -156,6 +192,23 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
                     {subjects.map((subject) => (
                       <SelectItem key={subject.value} value={subject.value}>
                         {subject.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="language">Preferred Language</Label>
+                <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Any Language</SelectItem>
+                    {languages.map((language) => (
+                      <SelectItem key={language.value} value={language.value}>
+                        {language.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -271,6 +324,19 @@ const FindTutorTab: React.FC<FindTutorTabProps> = ({ tutors, onScheduleWithTutor
                     {subjects.map((subject) => (
                       <SelectItem key={subject.value} value={subject.value}>
                         {subject.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select onValueChange={handleLanguageFilterChange}>
+                  <SelectTrigger className="w-[160px] h-8">
+                    <SelectValue placeholder="Filter by language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Languages</SelectItem>
+                    {languages.map((language) => (
+                      <SelectItem key={language.value} value={language.value}>
+                        {language.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

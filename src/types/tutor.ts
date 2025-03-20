@@ -13,4 +13,5 @@ export interface Tutor {
   level: number;
   badges: string[];
   communicationModes: ('text' | 'voice' | 'video')[];
+  languages?: string[]; // Languages spoken by the tutor
 }
