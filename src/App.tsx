@@ -16,7 +16,6 @@ import AiAssistant from "./pages/AiAssistant";
 import Gamification from "./pages/Gamification";
 import ProfileSettings from "./pages/ProfileSettings";
 import TutorConnection from "./pages/TutorConnection";
-import CrisisSupport from "./pages/CrisisSupport";
 import VisualAlert from "./components/accessibility/VisualAlert";
 import { useState, useEffect } from "react";
 
@@ -67,7 +66,6 @@ const App = () => {
               <Route path="/gamification" element={<Gamification />} />
               <Route path="/profile" element={<ProfileSettings />} />
               <Route path="/support" element={<TutorConnection />} />
-              <Route path="/crisis-support" element={<CrisisSupport />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

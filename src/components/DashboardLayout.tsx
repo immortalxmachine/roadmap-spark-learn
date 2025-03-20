@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { BookOpen, Brain, Award, FileText, Users, MessageCircle, Settings, BarChart3, Headphones, Volume2, VolumeX, Eye, EyeOff, Heart } from 'lucide-react';
+import { BookOpen, Brain, Award, FileText, Users, MessageCircle, Settings, BarChart3, Headphones, Volume2, VolumeX, Eye, EyeOff } from 'lucide-react';
 import AnimatedAvatar from './ui/avatar-animated';
 import { ScrollArea } from './ui/scroll-area';
 import { Separator } from './ui/separator';
@@ -61,12 +62,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       notification: false
     },
     { 
-      path: '/crisis-support', 
-      label: 'Crisis Support', 
-      icon: Heart,
-      notification: false
-    },
-    { 
       path: '/profile', 
       label: 'Settings', 
       icon: Settings,
@@ -82,6 +77,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex bg-background">
+      {/* Sidebar */}
       <div className="w-64 border-r border-border bg-card hidden md:flex flex-col">
         <div className="p-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
@@ -187,6 +183,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
       </div>
       
+      {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-background border-b border-border p-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -215,12 +212,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
       </div>
       
+      {/* Content */}
       <div className="flex-1 flex flex-col">
         <main className="flex-1 md:p-6 p-4 pt-16 md:pt-6 overflow-auto">
           {children}
         </main>
       </div>
       
+      {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border z-30">
         <div className="flex justify-between p-2">
           {navItems.slice(0, 5).map((item) => (
