@@ -18,8 +18,8 @@ interface SessionTabsProps {
 }
 
 const SessionTabs: React.FC<SessionTabsProps> = ({
-  activeSessions,
-  pastSessions,
+  activeSessions = [],
+  pastSessions = [],
   sessionFilter,
   onFilterChange,
   onJoinSession,
@@ -57,7 +57,7 @@ const SessionTabs: React.FC<SessionTabsProps> = ({
       
       {sessionFilter === 'upcoming' && (
         <ActiveSessionsList 
-          sessions={activeSessions}
+          sessions={activeSessions || []}
           onJoinSession={onJoinSession}
           onCancelSession={onCancelSession}
           onAddToCalendar={onAddToCalendar}
@@ -66,7 +66,7 @@ const SessionTabs: React.FC<SessionTabsProps> = ({
       
       {sessionFilter === 'past' && (
         <PastSessionsList 
-          sessions={pastSessions}
+          sessions={pastSessions || []}
           onReviewSubmit={onReviewSubmit}
         />
       )}

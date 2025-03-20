@@ -17,7 +17,10 @@ const ActiveSessionsList: React.FC<ActiveSessionsListProps> = ({
   onCancelSession, 
   onAddToCalendar 
 }) => {
-  if (sessions.length === 0) {
+  // Ensure sessions is always an array, default to empty array if undefined
+  const sessionList = Array.isArray(sessions) ? sessions : [];
+  
+  if (sessionList.length === 0) {
     return (
       <div className="p-8 text-center">
         <p className="text-muted-foreground">You don't have any active sessions yet.</p>
@@ -30,7 +33,7 @@ const ActiveSessionsList: React.FC<ActiveSessionsListProps> = ({
 
   return (
     <div className="divide-y">
-      {sessions.map((session) => (
+      {sessionList.map((session) => (
         <SessionCard
           key={session.id}
           session={session}
