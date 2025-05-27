@@ -15,7 +15,7 @@ export const useTutorSessions = () => {
     setError(null);
 
     try {
-      // First, get the sessions with proper query syntax
+      // First, get the sessions with proper query syntax - rating comes from tutors table
       const { data: userSessions, error: sessionsError } = await supabase
         .from('tutor_sessions')
         .select(`
@@ -26,9 +26,8 @@ export const useTutorSessions = () => {
           status, 
           mode, 
           feedback,
-          rating,
           tutor_id,
-          tutors!inner(id, name, avatar)
+          tutors!inner(id, name, avatar, rating)
         `)
         .order('start_time', { ascending: false });
 
@@ -48,7 +47,7 @@ export const useTutorSessions = () => {
           status: session.status as 'scheduled' | 'in-progress' | 'completed',
           mode: session.mode as 'text' | 'voice' | 'video',
           feedback: session.feedback,
-          rating: session.rating
+          rating: session.tutors?.rating // Get rating from tutors table
         }));
 
         setSessions(transformedSessions);
@@ -146,10 +145,10 @@ export const useTutorSessions = () => {
 
   const provideSessionFeedback = async (sessionId: string, rating: number, feedback: string) => {
     try {
+      // Note: Since rating doesn't exist in tutor_sessions table, we can only update feedback
       const { error } = await supabase
         .from('tutor_sessions')
         .update({ 
-          rating, 
           feedback,
           status: 'completed' 
         })
